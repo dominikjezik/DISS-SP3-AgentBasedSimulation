@@ -28,4 +28,12 @@
       <ProjectReference Include="..\DiscreteSimulation.Core\DiscreteSimulation.Core.csproj" />
       <ProjectReference Include="..\DiscreteSimulation.FurnitureManufacturer\DiscreteSimulation.FurnitureManufacturer.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Views\Panels\SingleReplicationPanel.axaml.cs">
+        <DependentUpon>SingleReplicationScreen.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+    </ItemGroup>
+    
 </Project>

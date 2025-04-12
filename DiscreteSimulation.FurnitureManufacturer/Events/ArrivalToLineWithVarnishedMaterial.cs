@@ -19,12 +19,12 @@ public class ArrivalToLineWithVarnishedMaterial : FurnitureManufacturerBaseEvent
         CurrentWorker.IsMovingToAssemblyLine = false;
         CurrentWorker.CurrentAssemblyLine = CurrentAssemblyLine;
         CurrentAssemblyLine.CurrentWorker = CurrentWorker;
-        CurrentWorker.CurrentOrder.State = "Folding";
+        CurrentWorker.CurrentFurniture.State = "Folding";
         
         // Naplanovanie dokončenia skladania nábytku
         double foldingTime;
         
-        switch (CurrentWorker.CurrentOrder.Type)
+        switch (CurrentWorker.CurrentFurniture.Type)
         {
             case FurnitureType.Desk:
                 foldingTime = Simulation.FoldingDeskTimeGenerator.Next();

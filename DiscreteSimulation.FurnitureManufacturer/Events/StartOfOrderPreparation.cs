@@ -11,10 +11,12 @@ public class StartOfOrderPreparation : FurnitureManufacturerBaseEvent
 
     public override void Execute()
     {
+        CurrentWorker.CurrentFurniture.Order.State = "In progress";
+        
         if (CurrentWorker.IsInWarehouse)
         {
             // Pracovník je v sklade, začína sa príprava materiálu
-            CurrentWorker.CurrentOrder.State = "Preparation in Warehouse";
+            CurrentWorker.CurrentFurniture.State = "Preparation in Warehouse";
             
             // Naplánovanie dokončenia prípravy materiálu
             var preparationCompletedTime = Simulation.SimulationTime + Simulation.MaterialPreparationTimeGenerator.Next();
@@ -25,7 +27,7 @@ public class StartOfOrderPreparation : FurnitureManufacturerBaseEvent
         else
         {
             // Pracovník nie je v sklade preto sa tam musí najskôr dostať
-            CurrentWorker.CurrentOrder.State = "Order assigned";
+            CurrentWorker.CurrentFurniture.State = "Furniture assigned";
             CurrentWorker.CurrentAssemblyLine?.IdleWorkers.Remove(CurrentWorker);
             CurrentWorker.IsMovingToWarehouse = true;
             
@@ -34,8 +36,5 @@ public class StartOfOrderPreparation : FurnitureManufacturerBaseEvent
             
             Simulation.ScheduleEvent(arrivalAtWarehouseForMaterial);
         }
-        
-        
-        
     }
 }

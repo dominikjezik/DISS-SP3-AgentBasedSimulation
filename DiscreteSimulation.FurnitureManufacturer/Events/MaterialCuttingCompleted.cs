@@ -15,10 +15,10 @@ public class MaterialCuttingCompleted : FurnitureManufacturerBaseEvent
         // Material bol narezaný, ak je k dispozícií pracovník zo skupiny C
         // tak sa presunie k linke s týmto materiálom
         
-        var currentOrder = CurrentWorker.CurrentOrder;
+        var currentOrder = CurrentWorker.CurrentFurniture;
         var currentAssemblyLine = CurrentWorker.CurrentAssemblyLine;
         
-        CurrentWorker.CurrentOrder = null;
+        CurrentWorker.CurrentFurniture = null;
         
         var availableWorker = Simulation.GetAvailableWorker(WorkerGroup.GroupC, currentAssemblyLine);
         
@@ -35,7 +35,7 @@ public class MaterialCuttingCompleted : FurnitureManufacturerBaseEvent
         {
             // Pracovník je k dispozícii, pracovník príde na linku s narezaným materiálom
             currentOrder.State = "Material cut (waiting for worker C)";
-            availableWorker.CurrentOrder = currentOrder;
+            availableWorker.CurrentFurniture = currentOrder;
             
             double arrivalTime;
 
@@ -73,7 +73,7 @@ public class MaterialCuttingCompleted : FurnitureManufacturerBaseEvent
         {
             var order = Simulation.PendingOrdersQueue.Dequeue();
             
-            CurrentWorker.CurrentOrder = order;
+            CurrentWorker.CurrentFurniture = order.FurnitureItems[0];
             
             Simulation.AverageWaitingTimeInPendingOrdersQueue.AddValue(Simulation.SimulationTime - order.StartedWaitingTime);
             

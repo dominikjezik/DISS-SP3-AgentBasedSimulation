@@ -12,14 +12,16 @@ public class AssemblyOfFittingsCompleted : FurnitureManufacturerBaseEvent
     public override void Execute()
     {
         // Kovanie bolo namontované na skriňu, objednávka nábytku je ukončená
-        var currentOrder = CurrentWorker.CurrentOrder;
+        var currentOrder = CurrentWorker.CurrentFurniture;
         var currentAssemblyLine = CurrentWorker.CurrentAssemblyLine;
         
-        CurrentWorker.CurrentOrder = null;
+        CurrentWorker.CurrentFurniture = null;
 
-        Simulation.AverageProcessingOrderTime.AddValue(Simulation.SimulationTime - currentOrder.ArrivalTime);
+        Simulation.AverageProcessingOrderTime.AddValue(Simulation.SimulationTime - currentOrder.Order.ArrivalTime);
         
         currentOrder.State = "Completed";
+        currentOrder.Order.State = "Completed";
+        currentOrder.Order.FinishedFurnitureItemsCount++;
         
         Simulation.ReleaseAssemblyLine(currentAssemblyLine);
         
@@ -28,7 +30,7 @@ public class AssemblyOfFittingsCompleted : FurnitureManufacturerBaseEvent
         {
             var pendingFoldedCloset = Simulation.PendingFoldedClosetsQueue.Dequeue();
             
-            CurrentWorker.CurrentOrder = pendingFoldedCloset;
+            CurrentWorker.CurrentFurniture = pendingFoldedCloset;
             CurrentWorker.IsMovingToAssemblyLine = true;
             
             Simulation.AverageWaitingTimeInPendingFoldedClosetsQueue.AddValue(Simulation.SimulationTime - pendingFoldedCloset.StartedWaitingTime);
@@ -43,7 +45,7 @@ public class AssemblyOfFittingsCompleted : FurnitureManufacturerBaseEvent
         {
             var pendingCutMaterial = Simulation.PendingCutMaterialsQueue.Dequeue();
             
-            CurrentWorker.CurrentOrder = pendingCutMaterial;
+            CurrentWorker.CurrentFurniture = pendingCutMaterial;
             CurrentWorker.IsMovingToAssemblyLine = true;
             
             Simulation.AverageWaitingTimeInPendingCutMaterialsQueue.AddValue(Simulation.SimulationTime - pendingCutMaterial.StartedWaitingTime);

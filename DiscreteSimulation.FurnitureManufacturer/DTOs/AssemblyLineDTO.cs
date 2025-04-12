@@ -6,6 +6,7 @@ namespace DiscreteSimulation.FurnitureManufacturer.DTOs;
 public class AssemblyLineDTO : INotifyPropertyChanged, IUpdatable<AssemblyLineDTO>
 {
     private int _id;
+    private bool _isBusy;
     private string _currentOrder;
     private string _currentWorker;
     private string _state;
@@ -18,6 +19,31 @@ public class AssemblyLineDTO : INotifyPropertyChanged, IUpdatable<AssemblyLineDT
             if (value == _id) return;
             _id = value;
             OnPropertyChanged(nameof(Id));
+        }
+    }
+    
+    public bool IsBusy
+    {
+        get => _isBusy;
+        set
+        {
+            if (value == _isBusy) return;
+            _isBusy = value;
+            OnPropertyChanged(nameof(IsBusy));
+            OnPropertyChanged(nameof(StatusColor));
+        }
+    }
+    
+    public string StatusColor
+    {
+        get
+        {
+            if (IsBusy)
+            {
+                return "Red";
+            }
+            
+            return "Green";
         }
     }
 
@@ -57,9 +83,19 @@ public class AssemblyLineDTO : INotifyPropertyChanged, IUpdatable<AssemblyLineDT
     public void Update(AssemblyLine assemblyLine)
     {
         Id = assemblyLine.Id;
-        CurrentOrder = assemblyLine.CurrentOrder?.Id.ToString() ?? "Free";
+
+        if (assemblyLine.CurrentFurniture == null)
+        {
+            CurrentOrder = "Free";
+            IsBusy = false;
+        }
+        else
+        {
+            CurrentOrder = assemblyLine.CurrentFurniture.DisplayId;
+            IsBusy = true;
+        }
         
-        State = assemblyLine.CurrentOrder?.State ?? string.Empty;
+        State = assemblyLine.CurrentFurniture?.State ?? string.Empty;
         CurrentWorker = assemblyLine.CurrentWorker?.DisplayId ?? string.Empty;
 
         if (assemblyLine.IdleWorkers.Count > 0)
@@ -85,6 +121,7 @@ public class AssemblyLineDTO : INotifyPropertyChanged, IUpdatable<AssemblyLineDT
         CurrentOrder = assemblyLineDTO.CurrentOrder;
         CurrentWorker = assemblyLineDTO.CurrentWorker;
         State = assemblyLineDTO.State;
+        IsBusy = assemblyLineDTO.IsBusy;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

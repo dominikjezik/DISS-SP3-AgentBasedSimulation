@@ -16,17 +16,19 @@ public class FurnitureFoldingCompleted : FurnitureManufacturerBaseEvent
         // Ak je k dispozícií pracovník zo skupiny C
         // tak sa presunie k linke s týmto nábytkom
         
-        var currentOrder = CurrentWorker.CurrentOrder;
+        var currentOrder = CurrentWorker.CurrentFurniture;
         var currentAssemblyLine = CurrentWorker.CurrentAssemblyLine;
         
-        CurrentWorker.CurrentOrder = null;
+        CurrentWorker.CurrentFurniture = null;
         
         if (currentOrder.Type != FurnitureType.Closet)
         {
             // Objednávka nábytku je ukončená
-            Simulation.AverageProcessingOrderTime.AddValue(Simulation.SimulationTime - currentOrder.ArrivalTime);
+            Simulation.AverageProcessingOrderTime.AddValue(Simulation.SimulationTime - currentOrder.Order.ArrivalTime);
             
             currentOrder.State = "Completed";
+            currentOrder.Order.State = "Completed";
+            currentOrder.Order.FinishedFurnitureItemsCount++;
 
             Simulation.ReleaseAssemblyLine(currentAssemblyLine);
         }
@@ -47,7 +49,7 @@ public class FurnitureFoldingCompleted : FurnitureManufacturerBaseEvent
             {
                 // Pracovník je k dispozícii, pracovník príde na linku so zloženou skriňou
                 currentOrder.State = "Folded (waiting for worker C)";
-                availableWorker.CurrentOrder = currentOrder;
+                availableWorker.CurrentFurniture = currentOrder;
                 
                 double arrivalTime;
                 
@@ -86,7 +88,7 @@ public class FurnitureFoldingCompleted : FurnitureManufacturerBaseEvent
         {
             var pendingVarnishedMaterial = Simulation.PendingVarnishedMaterialsQueue.Dequeue();
             
-            CurrentWorker.CurrentOrder = pendingVarnishedMaterial;
+            CurrentWorker.CurrentFurniture = pendingVarnishedMaterial;
             CurrentWorker.IsMovingToAssemblyLine = true;
             
             Simulation.AverageWaitingTimeInPendingVarnishedMaterialsQueue.AddValue(Simulation.SimulationTime - pendingVarnishedMaterial.StartedWaitingTime);

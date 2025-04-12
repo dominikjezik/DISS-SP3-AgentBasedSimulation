@@ -60,11 +60,11 @@ public class FurnitureManufacturerSimulation : EventSimulationCore
 
     public EntitiesQueue<Order> PendingOrdersQueue { get; private set; }
     
-    public EntitiesQueue<Order> PendingCutMaterialsQueue { get; private set; } 
+    public EntitiesQueue<Furniture> PendingCutMaterialsQueue { get; private set; } 
     
-    public EntitiesQueue<Order> PendingVarnishedMaterialsQueue { get; private set; }
+    public EntitiesQueue<Furniture> PendingVarnishedMaterialsQueue { get; private set; }
     
-    public EntitiesQueue<Order> PendingFoldedClosetsQueue { get; private set; }
+    public EntitiesQueue<Furniture> PendingFoldedClosetsQueue { get; private set; }
 
     #endregion
 
@@ -127,9 +127,9 @@ public class FurnitureManufacturerSimulation : EventSimulationCore
     public FurnitureManufacturerSimulation()
     {
         PendingOrdersQueue = new EntitiesQueue<Order>(this);
-        PendingCutMaterialsQueue = new EntitiesQueue<Order>(this);
-        PendingVarnishedMaterialsQueue = new EntitiesQueue<Order>(this);
-        PendingFoldedClosetsQueue = new EntitiesQueue<Order>(this);
+        PendingCutMaterialsQueue = new EntitiesQueue<Furniture>(this);
+        PendingVarnishedMaterialsQueue = new EntitiesQueue<Furniture>(this);
+        PendingFoldedClosetsQueue = new EntitiesQueue<Furniture>(this);
     }
 
     public override void BeforeSimulation(int? seedForSeedGenerator = null)
@@ -306,7 +306,7 @@ public class FurnitureManufacturerSimulation : EventSimulationCore
         var newAssemblyLine = new AssemblyLine
         {
             Id = AssemblyLines.Count + 1,
-            CurrentOrder = null,
+            CurrentFurniture = null,
             CurrentWorker = null
         };
         
@@ -317,8 +317,8 @@ public class FurnitureManufacturerSimulation : EventSimulationCore
     
     public void ReleaseAssemblyLine(AssemblyLine assemblyLine)
     {
-        assemblyLine.CurrentOrder.CurrentAssemblyLine = null;
-        assemblyLine.CurrentOrder = null;
+        assemblyLine.CurrentFurniture.CurrentAssemblyLine = null;
+        assemblyLine.CurrentFurniture = null;
         assemblyLine.CurrentWorker = null;
         
         AvailableAssemblyLines.Enqueue(assemblyLine, assemblyLine.Id);
@@ -354,17 +354,17 @@ public class FurnitureManufacturerSimulation : EventSimulationCore
         return PendingOrdersQueue.OriginalQueue.Select(order => order.ToDTO(SimulationTime)).ToList();
     }
     
-    public List<OrderDTO> GetCurrentPendingCutMaterialsQueue()
+    public List<FurnitureDTO> GetCurrentPendingCutMaterialsQueue()
     {
         return PendingCutMaterialsQueue.OriginalQueue.Select(order => order.ToDTO(SimulationTime)).ToList();
     }
     
-    public List<OrderDTO> GetCurrentPendingVarnishedMaterialsQueue()
+    public List<FurnitureDTO> GetCurrentPendingVarnishedMaterialsQueue()
     {
         return PendingVarnishedMaterialsQueue.OriginalQueue.Select(order => order.ToDTO(SimulationTime)).ToList();
     }
     
-    public List<OrderDTO> GetCurrentPendingFoldedClosetsQueue()
+    public List<FurnitureDTO> GetCurrentPendingFoldedClosetsQueue()
     {
         return PendingFoldedClosetsQueue.OriginalQueue.Select(order => order.ToDTO(SimulationTime)).ToList();
     }

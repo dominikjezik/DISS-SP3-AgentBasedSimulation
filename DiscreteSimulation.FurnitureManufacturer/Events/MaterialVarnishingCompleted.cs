@@ -16,10 +16,10 @@ public class MaterialVarnishingCompleted : FurnitureManufacturerBaseEvent
         // Ak je k dispozícií pracovník zo skupiny B
         // tak sa presunie k linke s týmto materiálom
         
-        var currentOrder = CurrentWorker.CurrentOrder;
+        var currentOrder = CurrentWorker.CurrentFurniture;
         var currentAssemblyLine = CurrentWorker.CurrentAssemblyLine;
         
-        CurrentWorker.CurrentOrder = null;
+        CurrentWorker.CurrentFurniture = null;
 
         var availableWorker = Simulation.GetAvailableWorker(WorkerGroup.GroupB, currentAssemblyLine);
         
@@ -36,7 +36,7 @@ public class MaterialVarnishingCompleted : FurnitureManufacturerBaseEvent
         {
             // Pracovník je k dispozícii, pracoovník príde na linku s namoreným a nalakovaným materiálom
             currentOrder.State = "Varnished (waiting for worker B)";
-            availableWorker.CurrentOrder = currentOrder;
+            availableWorker.CurrentFurniture = currentOrder;
             
             double arrivalTime;
             
@@ -75,7 +75,7 @@ public class MaterialVarnishingCompleted : FurnitureManufacturerBaseEvent
         {
             var pendingFoldedCloset = Simulation.PendingFoldedClosetsQueue.Dequeue();
             
-            CurrentWorker.CurrentOrder = pendingFoldedCloset;
+            CurrentWorker.CurrentFurniture = pendingFoldedCloset;
             CurrentWorker.IsMovingToAssemblyLine = true;
             
             Simulation.AverageWaitingTimeInPendingFoldedClosetsQueue.AddValue(Simulation.SimulationTime - pendingFoldedCloset.StartedWaitingTime);
@@ -90,7 +90,7 @@ public class MaterialVarnishingCompleted : FurnitureManufacturerBaseEvent
         {
             var pendingCutMaterial = Simulation.PendingCutMaterialsQueue.Dequeue();
             
-            CurrentWorker.CurrentOrder = pendingCutMaterial;
+            CurrentWorker.CurrentFurniture = pendingCutMaterial;
             CurrentWorker.IsMovingToAssemblyLine = true;
             
             Simulation.AverageWaitingTimeInPendingCutMaterialsQueue.AddValue(Simulation.SimulationTime - pendingCutMaterial.StartedWaitingTime);

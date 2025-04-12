@@ -9,7 +9,7 @@ public class WorkerDTO : INotifyPropertyChanged, IUpdatable<WorkerDTO>
     private string _id;
     private bool _isBusy;
     private string _place;
-    private string _order;
+    private string _furniture;
     private string _state;
     private string _utilization;
 
@@ -60,14 +60,14 @@ public class WorkerDTO : INotifyPropertyChanged, IUpdatable<WorkerDTO>
         }
     }
 
-    public string Order
+    public string Furniture
     {
-        get => _order;
+        get => _furniture;
         set
         {
-            if (value == _order) return;
-            _order = value;
-            OnPropertyChanged(nameof(Order));
+            if (value == _furniture) return;
+            _furniture = value;
+            OnPropertyChanged(nameof(Furniture));
         }
     }
 
@@ -118,15 +118,15 @@ public class WorkerDTO : INotifyPropertyChanged, IUpdatable<WorkerDTO>
             Place = "???";
         }
         
-        Order = worker.CurrentOrder?.Id.ToString() ?? string.Empty;
-        
-        if (worker.CurrentOrder == null)
+        if (worker.CurrentFurniture == null)
         {
+            Furniture = string.Empty;
             State = "Idle";
         }
         else
         {
-            State = worker.CurrentOrder.State;
+            Furniture = worker.CurrentFurniture.DisplayId;
+            State = worker.CurrentFurniture.State;
         }
         
         Utilization = worker.Utilization.ToString("0.00%");
@@ -138,7 +138,7 @@ public class WorkerDTO : INotifyPropertyChanged, IUpdatable<WorkerDTO>
     {
         Id = workerDTO.Id;
         Place = workerDTO.Place;
-        Order = workerDTO.Order;
+        Furniture = workerDTO.Furniture;
         State = workerDTO.State;
         Utilization = workerDTO.Utilization;
         IsBusy = workerDTO.IsBusy;

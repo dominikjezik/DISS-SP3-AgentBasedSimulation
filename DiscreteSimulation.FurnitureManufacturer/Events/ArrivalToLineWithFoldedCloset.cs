@@ -18,7 +18,7 @@ public class ArrivalToLineWithFoldedCloset : FurnitureManufacturerBaseEvent
         CurrentWorker.IsMovingToAssemblyLine = false;
         CurrentWorker.CurrentAssemblyLine = CurrentAssemblyLine;
         CurrentAssemblyLine.CurrentWorker = CurrentWorker;
-        CurrentWorker.CurrentOrder.State = "Assembling fittings";
+        CurrentWorker.CurrentFurniture.State = "Assembling fittings";
         
         // Naplanovanie dokončenia montáže kovania skrine
         var assemblyTime = Simulation.AssemblyOfFittingsOnClosetTimeGenerator.Next();

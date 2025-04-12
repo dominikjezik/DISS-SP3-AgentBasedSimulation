@@ -1,0 +1,694 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:scottPlot="clr-namespace:ScottPlot.Avalonia;assembly=ScottPlot.Avalonia"
+             xmlns:vmp="clr-namespace:DiscreteSimulation.GUI.ViewModels.Panels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="DiscreteSimulation.GUI.Views.Panels.MultipleReplicationsPanel"
+             x:DataType="vmp:MultipleReplicationsPanelViewModel">
+    
+    <Grid
+        RowDefinitions="Auto,Auto,Auto,*" ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,*,Auto"
+        IsVisible="{Binding Shared.IsMultipleReplications}">
+        
+            <Label Grid.Row="0" Grid.Column="0" Margin="10,12,0,0">Skip first (%)</Label>
+            <TextBox
+                Grid.Row="0" Grid.Column="1"
+                Margin="10,5,0,0"
+                IsEnabled="{Binding Shared.IsStartSimulationButtonEnabled}"
+                Text="{Binding SkipFirstNReplicationsInPercent}"
+                Height="20"
+                Width="120" />
+    
+            <Label Grid.Row="0" Grid.Column="2" Margin="10,12,0,0">Render offset</Label>
+            <TextBox
+                Grid.Row="0" Grid.Column="3"
+                IsEnabled="False"
+                Margin="10,5,0,0"
+                Text="{Binding RenderOffset}"
+                Height="20"
+                Width="120"/>
+    
+            <Label Grid.Row="0" Grid.Column="4" Margin="10,12,0,0">Render points</Label>
+            <TextBox
+                Grid.Row="0" Grid.Column="5"
+                Margin="10,5,0,0"
+                IsEnabled="{Binding Shared.IsStartSimulationButtonEnabled}"
+                Text="{Binding RenderPoints}"
+                Height="20"
+                Width="120"/>
+            
+            <Label Grid.Row="1" Grid.Column="0" Margin="10,12,0,0">Workers group A</Label>
+            <TextBox
+                Grid.Row="1" Grid.Column="1"
+                Margin="10,5,0,0"
+                IsEnabled="{Binding Shared.IsStartSimulationButtonEnabled}"
+                Text="{Binding Shared.CountOfWorkersGroupA}"
+                Height="20"
+                Width="120" />
+            
+            <Label Grid.Row="1" Grid.Column="2" Margin="10,12,0,0">Workers group B</Label>
+            <TextBox
+                Grid.Row="1" Grid.Column="3"
+                Margin="10,5,0,0"
+                IsEnabled="{Binding Shared.IsStartSimulationButtonEnabled}"
+                Text="{Binding Shared.CountOfWorkersGroupB}"
+                Height="20"
+                Width="120" />
+            
+            <Label Grid.Row="1" Grid.Column="4" Margin="10,12,0,0">Workers group C</Label>
+            <TextBox
+                Grid.Row="1" Grid.Column="5"
+                Margin="10,5,0,0"
+                IsEnabled="{Binding Shared.IsStartSimulationButtonEnabled}"
+                Text="{Binding Shared.CountOfWorkersGroupC}"
+                Height="20"
+                Width="120" />
+            
+            <Grid
+                Grid.Row="0" Grid.Column="9" Grid.RowSpan="4"
+                RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,*" 
+                ColumnDefinitions="Auto,*,Auto,*,Auto,*,Auto"
+                Width="520"
+                Margin="5,0,0,0">
+                
+                <Label
+                    Grid.Row="0" Grid.Column="0"
+                    Margin="0,0,0,10"
+                    FontSize="18"
+                    FontWeight="Bold"
+                    FontFamily="Source Code Pro"
+                    VerticalAlignment="Center"
+                    Content="Statistics" />
+                
+                <SelectableTextBlock
+                    Grid.Row="1" Grid.Column="0"
+                    Margin="5,0,0,10"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    Text="Replications" />
+        
+                <SelectableTextBlock
+                    Grid.Row="1" Grid.Column="2"
+                    Margin="0,0,0,10"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    HorizontalAlignment="Center"
+                    Text="{Binding CurrentReplication}" />
+        
+                <SelectableTextBlock
+                    Grid.Row="2" Grid.Column="0"
+                    Margin="5,0,0,10"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    Text="Order processing time" />
+        
+                <SelectableTextBlock
+                    Grid.Row="2" Grid.Column="2"
+                    Margin="0,0,0,10"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    HorizontalAlignment="Center"
+                    Text="{Binding SimulationCurrentProcessingOrderTime}" />
+                
+                <SelectableTextBlock
+                    Grid.Row="2" Grid.Column="4"
+                    Margin="0,0,0,10"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    HorizontalAlignment="Center"
+                    Text="{Binding SimulationCurrentProcessingOrderTimeCI}" />
+                
+                <SelectableTextBlock
+                    Grid.Row="2" Grid.Column="6"
+                    Margin="0,0,10,10"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    Text="{Binding Shared.SelectedTimeUnits}" >
+                    
+                    <SelectableTextBlock.ContextMenu>
+                        <ContextMenu >
+                            <MenuItem Header="seconds" Click="MenuItem_OnClick" />
+                            <MenuItem Header="minutes" Click="MenuItem_OnClick" />
+                            <MenuItem Header="hours" Click="MenuItem_OnClick" />
+                        </ContextMenu>
+                    </SelectableTextBlock.ContextMenu>
+                    
+                </SelectableTextBlock>
+               
+                <SelectableTextBlock
+                    Grid.Row="3" Grid.Column="0"
+                    Margin="5,0,0,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    Text="Pending orders" />
+        
+                <SelectableTextBlock
+                    Grid.Row="3" Grid.Column="2"
+                    Margin="0,0,0,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    HorizontalAlignment="Center"
+                    Text="{Binding SimulationPendingOrders}" />
+                
+                <SelectableTextBlock
+                    Grid.Row="3" Grid.Column="4"
+                    Margin="0,0,0,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    HorizontalAlignment="Center"
+                    Text="{Binding SimulationPendingOrdersCI}" />
+                
+                <SelectableTextBlock
+                    Grid.Row="3" Grid.Column="6"
+                    Margin="0,0,10,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    Text="orders" />
+                
+                <SelectableTextBlock
+                    Grid.Row="4" Grid.Column="0"
+                    Margin="5,0,0,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    Text="Pending furniture items" />
+        
+                <SelectableTextBlock
+                    Grid.Row="4" Grid.Column="2"
+                    Margin="0,0,0,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    HorizontalAlignment="Center"
+                    Text="{Binding SimulationPendingFurnitureItems}" />
+                
+                <SelectableTextBlock
+                    Grid.Row="4" Grid.Column="4"
+                    Margin="0,0,0,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    HorizontalAlignment="Center"
+                    Text="{Binding SimulationPendingFurnitureItemsCI}" />
+                
+                <SelectableTextBlock
+                    Grid.Row="4" Grid.Column="6"
+                    Margin="0,0,10,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    Text="items" />
+                
+                <SelectableTextBlock
+                    Grid.Row="5" Grid.Column="0"
+                    Margin="5,0,0,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    Text="Pending items for staining" />
+        
+                <SelectableTextBlock
+                    Grid.Row="5" Grid.Column="2"
+                    Margin="0,0,0,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    HorizontalAlignment="Center"
+                    Text="{Binding SimulationPendingItemsForStaining}" />
+                
+                <SelectableTextBlock
+                    Grid.Row="5" Grid.Column="4"
+                    Margin="0,0,0,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    HorizontalAlignment="Center"
+                    Text="{Binding SimulationPendingItemsForStainingCI}" />
+                
+                <SelectableTextBlock
+                    Grid.Row="5" Grid.Column="6"
+                    Margin="0,0,10,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    Text="items" />
+                
+                <SelectableTextBlock
+                    Grid.Row="6" Grid.Column="0"
+                    Margin="5,0,0,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    Text="Pending items for varnishing" />
+        
+                <SelectableTextBlock
+                    Grid.Row="6" Grid.Column="2"
+                    Margin="0,0,0,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    HorizontalAlignment="Center"
+                    Text="{Binding SimulationPendingItemsForVarnishing}" />
+                
+                <SelectableTextBlock
+                    Grid.Row="6" Grid.Column="4"
+                    Margin="0,0,0,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    HorizontalAlignment="Center"
+                    Text="{Binding SimulationPendingItemsForVarnishingCI}" />
+                
+                <SelectableTextBlock
+                    Grid.Row="6" Grid.Column="6"
+                    Margin="0,0,10,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    Text="items" />
+                
+                <SelectableTextBlock
+                    Grid.Row="7" Grid.Column="0"
+                    Margin="5,0,0,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    Text="Pending items for folding" />
+        
+                <SelectableTextBlock
+                    Grid.Row="7" Grid.Column="2"
+                    Margin="0,0,0,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    HorizontalAlignment="Center"
+                    Text="{Binding SimulationPendingItemsForFolding}" />
+                
+                <SelectableTextBlock
+                    Grid.Row="7" Grid.Column="4"
+                    Margin="0,0,0,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    HorizontalAlignment="Center"
+                    Text="{Binding SimulationPendingItemsForFoldingCI}" />
+                
+                <SelectableTextBlock
+                    Grid.Row="7" Grid.Column="6"
+                    Margin="0,0,10,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    Text="items" />
+                
+                <SelectableTextBlock
+                    Grid.Row="8" Grid.Column="0"
+                    Margin="5,0,0,10"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    Text="Pending closets for fittings" />
+        
+                <SelectableTextBlock
+                    Grid.Row="8" Grid.Column="2"
+                    Margin="0,0,0,10"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    HorizontalAlignment="Center"
+                    Text="{Binding SimulationPendingItemsForFittings}" />
+                
+                <SelectableTextBlock
+                    Grid.Row="8" Grid.Column="4"
+                    Margin="0,0,0,10"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    HorizontalAlignment="Center"
+                    Text="{Binding SimulationPendingItemsForFittingsCI}" />
+                
+                <SelectableTextBlock
+                    Grid.Row="8" Grid.Column="6"
+                    Margin="0,0,10,10"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    Text="items" />
+
+                <SelectableTextBlock
+                    Grid.Row="9" Grid.Column="0"
+                    Margin="5,0,0,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    Text="Waiting time pending orders" />
+        
+                <SelectableTextBlock
+                    Grid.Row="9" Grid.Column="2"
+                    Margin="0,0,0,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    HorizontalAlignment="Center"
+                    Text="{Binding SimulationPendingOrdersWaitingTime}" />
+                
+                <SelectableTextBlock
+                    Grid.Row="9" Grid.Column="4"
+                    Margin="0,0,0,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    HorizontalAlignment="Center"
+                    Text="{Binding SimulationPendingOrdersWaitingTimeCI}" />
+                
+                <SelectableTextBlock
+                    Grid.Row="9" Grid.Column="6"
+                    Margin="0,0,10,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    Text="{Binding Shared.SelectedTimeUnits}" >
+                    
+                    <SelectableTextBlock.ContextMenu>
+                        <ContextMenu >
+                            <MenuItem Header="seconds" Click="MenuItem_OnClick" />
+                            <MenuItem Header="minutes" Click="MenuItem_OnClick" />
+                            <MenuItem Header="hours" Click="MenuItem_OnClick" />
+                        </ContextMenu>
+                    </SelectableTextBlock.ContextMenu>
+                    
+                </SelectableTextBlock>
+                
+                <SelectableTextBlock
+                    Grid.Row="10" Grid.Column="0"
+                    Margin="5,0,0,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    Text="Waiting time pending items" />
+        
+                <SelectableTextBlock
+                    Grid.Row="10" Grid.Column="2"
+                    Margin="0,0,0,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    HorizontalAlignment="Center"
+                    Text="{Binding SimulationPendingFurnitureItemsWaitingTime}" />
+                
+                <SelectableTextBlock
+                    Grid.Row="10" Grid.Column="4"
+                    Margin="0,0,0,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    HorizontalAlignment="Center"
+                    Text="{Binding SimulationPendingFurnitureItemsWaitingTimeCI}" />
+                
+                <SelectableTextBlock
+                    Grid.Row="10" Grid.Column="6"
+                    Margin="0,0,10,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    Text="{Binding Shared.SelectedTimeUnits}" >
+                    
+                    <SelectableTextBlock.ContextMenu>
+                        <ContextMenu >
+                            <MenuItem Header="seconds" Click="MenuItem_OnClick" />
+                            <MenuItem Header="minutes" Click="MenuItem_OnClick" />
+                            <MenuItem Header="hours" Click="MenuItem_OnClick" />
+                        </ContextMenu>
+                    </SelectableTextBlock.ContextMenu>
+                    
+                </SelectableTextBlock>
+
+                <SelectableTextBlock
+                    Grid.Row="11" Grid.Column="0"
+                    Margin="5,0,0,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    Text="Waiting time items for staining" />
+        
+                <SelectableTextBlock
+                    Grid.Row="11" Grid.Column="2"
+                    Margin="0,0,0,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    HorizontalAlignment="Center"
+                    Text="{Binding SimulationItemsForStainingWaitingTime}" />
+                
+                <SelectableTextBlock
+                    Grid.Row="11" Grid.Column="4"
+                    Margin="0,0,0,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    HorizontalAlignment="Center"
+                    Text="{Binding SimulationItemsForStainingWaitingTimeCI}" />
+                
+                <SelectableTextBlock
+                    Grid.Row="11" Grid.Column="6"
+                    Margin="0,0,10,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    Text="{Binding Shared.SelectedTimeUnits}" >
+                    
+                    <SelectableTextBlock.ContextMenu>
+                        <ContextMenu >
+                            <MenuItem Header="seconds" Click="MenuItem_OnClick" />
+                            <MenuItem Header="minutes" Click="MenuItem_OnClick" />
+                            <MenuItem Header="hours" Click="MenuItem_OnClick" />
+                        </ContextMenu>
+                    </SelectableTextBlock.ContextMenu>
+                    
+                </SelectableTextBlock>
+                
+                <SelectableTextBlock
+                    Grid.Row="12" Grid.Column="0"
+                    Margin="5,0,0,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    Text="Waiting time items for varnishing" />
+        
+                <SelectableTextBlock
+                    Grid.Row="12" Grid.Column="2"
+                    Margin="0,0,0,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    HorizontalAlignment="Center"
+                    Text="{Binding SimulationItemsForVarnishingWaitingTime}" />
+                
+                <SelectableTextBlock
+                    Grid.Row="12" Grid.Column="4"
+                    Margin="0,0,0,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    HorizontalAlignment="Center"
+                    Text="{Binding SimulationItemsForVarnishingWaitingTimeCI}" />
+                
+                <SelectableTextBlock
+                    Grid.Row="12" Grid.Column="6"
+                    Margin="0,0,10,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    Text="{Binding Shared.SelectedTimeUnits}" >
+                    
+                    <SelectableTextBlock.ContextMenu>
+                        <ContextMenu >
+                            <MenuItem Header="seconds" Click="MenuItem_OnClick" />
+                            <MenuItem Header="minutes" Click="MenuItem_OnClick" />
+                            <MenuItem Header="hours" Click="MenuItem_OnClick" />
+                        </ContextMenu>
+                    </SelectableTextBlock.ContextMenu>
+                    
+                </SelectableTextBlock>
+                
+                <SelectableTextBlock
+                    Grid.Row="13" Grid.Column="0"
+                    Margin="5,0,0,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    Text="Waiting time items for folding" />
+        
+                <SelectableTextBlock
+                    Grid.Row="13" Grid.Column="2"
+                    Margin="0,0,0,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    HorizontalAlignment="Center"
+                    Text="{Binding SimulationItemsForFoldingWaitingTime}" />
+                
+                <SelectableTextBlock
+                    Grid.Row="13" Grid.Column="4"
+                    Margin="0,0,0,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    HorizontalAlignment="Center"
+                    Text="{Binding SimulationItemsForFoldingWaitingTimeCI}" />
+                
+                <SelectableTextBlock
+                    Grid.Row="13" Grid.Column="6"
+                    Margin="0,0,10,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    Text="{Binding Shared.SelectedTimeUnits}" >
+                    
+                    <SelectableTextBlock.ContextMenu>
+                        <ContextMenu >
+                            <MenuItem Header="seconds" Click="MenuItem_OnClick" />
+                            <MenuItem Header="minutes" Click="MenuItem_OnClick" />
+                            <MenuItem Header="hours" Click="MenuItem_OnClick" />
+                        </ContextMenu>
+                    </SelectableTextBlock.ContextMenu>
+                    
+                </SelectableTextBlock>
+                
+                <SelectableTextBlock
+                    Grid.Row="14" Grid.Column="0"
+                    Margin="5,0,0,10"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    Text="Waiting time closets for fittings" />
+        
+                <SelectableTextBlock
+                    Grid.Row="14" Grid.Column="2"
+                    Margin="0,0,0,10"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    HorizontalAlignment="Center"
+                    Text="{Binding SimulationItemsForFittingsWaitingTime}" />
+                
+                <SelectableTextBlock
+                    Grid.Row="14" Grid.Column="4"
+                    Margin="0,0,0,10"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    HorizontalAlignment="Center"
+                    Text="{Binding SimulationItemsForFittingsWaitingTimeCI}" />
+                
+                <SelectableTextBlock
+                    Grid.Row="14" Grid.Column="6"
+                    Margin="0,0,10,10"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    Text="{Binding Shared.SelectedTimeUnits}" >
+                    
+                    <SelectableTextBlock.ContextMenu>
+                        <ContextMenu >
+                            <MenuItem Header="seconds" Click="MenuItem_OnClick" />
+                            <MenuItem Header="minutes" Click="MenuItem_OnClick" />
+                            <MenuItem Header="hours" Click="MenuItem_OnClick" />
+                        </ContextMenu>
+                    </SelectableTextBlock.ContextMenu>
+                    
+                </SelectableTextBlock>
+                
+                <SelectableTextBlock
+                    Grid.Row="15" Grid.Column="0"
+                    Margin="5,0,0,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    Text="Workers A utilization" />
+                
+                <SelectableTextBlock
+                    Grid.Row="15" Grid.Column="2"
+                    Margin="0,0,0,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    HorizontalAlignment="Center"
+                    Text="{Binding SimulationWorkersAUtilization}" />
+                
+                <SelectableTextBlock
+                    Grid.Row="15" Grid.Column="4"
+                    Margin="0,0,0,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    HorizontalAlignment="Center"
+                    Text="{Binding SimulationWorkersAUtilizationCI}" />
+                
+                <SelectableTextBlock
+                    Grid.Row="15" Grid.Column="6"
+                    Margin="0,0,10,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    Text="%" />
+                
+                <SelectableTextBlock
+                    Grid.Row="16" Grid.Column="0"
+                    Margin="5,0,0,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    Text="Workers B utilization" />
+                
+                <SelectableTextBlock
+                    Grid.Row="16" Grid.Column="2"
+                    Margin="0,0,0,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    HorizontalAlignment="Center"
+                    Text="{Binding SimulationWorkersBUtilization}" />
+                
+                <SelectableTextBlock
+                    Grid.Row="16" Grid.Column="4"
+                    Margin="0,0,0,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    HorizontalAlignment="Center"
+                    Text="{Binding SimulationWorkersBUtilizationCI}" />
+                
+                <SelectableTextBlock
+                    Grid.Row="16" Grid.Column="6"
+                    Margin="0,0,10,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    Text="%" />
+                
+                <SelectableTextBlock
+                    Grid.Row="17" Grid.Column="0"
+                    Margin="5,0,0,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    Text="Workers C utilization" />
+                
+                <SelectableTextBlock
+                    Grid.Row="17" Grid.Column="2"
+                    Margin="0,0,0,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    HorizontalAlignment="Center"
+                    Text="{Binding SimulationWorkersCUtilization}" />
+                
+                <SelectableTextBlock
+                    Grid.Row="17" Grid.Column="4"
+                    Margin="0,0,0,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    HorizontalAlignment="Center"
+                    Text="{Binding SimulationWorkersCUtilizationCI}" />
+                
+                <SelectableTextBlock
+                    Grid.Row="17" Grid.Column="6"
+                    Margin="0,0,10,3"
+                    FontSize="14"
+                    FontFamily="Source Code Pro"
+                    Text="%" />
+                
+                <Label
+                    Grid.Row="18" Grid.Column="0" Grid.ColumnSpan="3"
+                    Margin="5,10,0,5"
+                    FontSize="16"
+                    FontFamily="Source Code Pro"
+                    Content="Individual workers utilization" />
+                
+                <DataGrid Grid.Row="19" Grid.Column="0" Grid.ColumnSpan="7"
+                          Margin="5,0,10,66" 
+                          ItemsSource="{Binding SimulationAllWorkersUtilization}"
+                          SelectionMode="Single"
+                          CanUserSortColumns="False"
+                          IsReadOnly="True"
+                          GridLinesVisibility="All"
+                          RowHeight="24"
+                          BorderThickness="1" BorderBrush="Gray">
+            
+                    <DataGrid.Styles>
+                        <Style Selector="DataGridColumnHeader">
+                            <Setter Property="FontWeight" Value="Bold"/>
+                        </Style>
+                        <Style Selector="DataGridCell:current /template/ Grid#FocusVisual"> 
+                            <Setter Property="IsVisible" Value="false" /> 
+                        </Style> 
+                    </DataGrid.Styles>
+            
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="ID" Width="Auto" Binding="{Binding Id}" />
+                        <DataGridTextColumn Header="Group" Width="Auto" Binding="{Binding State}" />
+                        <DataGridTextColumn Header="Utilization" Width="Auto" Binding="{Binding Utilization}" />
+                        <DataGridTextColumn Header="Utilization 95% CI" Width="*" Binding="{Binding Place}" />
+                    </DataGrid.Columns>
+                </DataGrid>
+        
+            </Grid>
+        
+        <scottPlot:AvaPlot
+            IsVisible="{Binding Shared.IsMultipleReplications}"
+            Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="9"
+            Margin="15,10,0,15"
+            Name="ProcessingOrderTimePlot" />
+    </Grid>
+    
+    
+</UserControl>

@@ -4,7 +4,7 @@ public class AssemblyLine
 {
     public int Id { get; set; }
     
-    public Order? CurrentOrder { get; set; }
+    public Furniture? CurrentFurniture { get; set; }
     
     public Worker? CurrentWorker { get; set; }
     

@@ -12,7 +12,7 @@ public class MaterialPreparationCompleted : FurnitureManufacturerBaseEvent
     public override void Execute()
     {
         // Material bol pripravený, teraz ho pracovník prenáša na linku
-        CurrentWorker.CurrentOrder.State = "Material prepared";
+        CurrentWorker.CurrentFurniture.State = "Material prepared";
         CurrentWorker.IsInWarehouse = false;
         CurrentWorker.IsMovingToAssemblyLine = true;
             

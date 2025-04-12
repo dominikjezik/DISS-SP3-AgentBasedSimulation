@@ -1,0 +1,1081 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vmp="clr-namespace:DiscreteSimulation.GUI.ViewModels.Panels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="DiscreteSimulation.GUI.Views.Panels.SingleReplicationPanel"
+             x:DataType="vmp:SingleReplicationPanelViewModel">
+    
+    <Grid 
+        RowDefinitions="7*,3*" ColumnDefinitions="450,*,400"
+        IsVisible="{Binding Shared.IsSingleReplication}">
+        
+        <TabControl Grid.Row="0" Grid.Column="0" Margin="0,0,0,0">
+            <TabItem Header="Orders" FontSize="16" FontWeight="Bold">
+                <Grid
+                    RowDefinitions="*,170"
+                    ColumnDefinitions="*"
+                    Margin="0,5,0,0">
+        
+                    <DataGrid Grid.Row="0" Grid.Column="0"
+                              Grid.RowSpan="{Binding OrdersDataGridsRowSpan}"
+                              Margin="0,0,5,0"
+                              ItemsSource="{Binding Orders}"
+                              SelectionMode="Single"
+                              SelectedItem="{Binding SelectedOrder}"
+                              CanUserSortColumns="False"
+                              IsReadOnly="True"
+                              GridLinesVisibility="All"
+                              RowHeight="24"
+                              BorderThickness="1" BorderBrush="Gray">
+        
+                        <DataGrid.Styles>
+                            <Style Selector="DataGridColumnHeader">
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Style>
+                            <Style Selector="DataGridCell:current /template/ Grid#FocusVisual">
+                                <Setter Property="IsVisible" Value="false" />
+                            </Style>
+                        </DataGrid.Styles>
+        
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="#" Width="Auto" Binding="{Binding Id}" />
+                            <DataGridTextColumn Header="Items" Width="Auto" Binding="{Binding CountOfFurnitureItems}" />
+                            <DataGridTextColumn Header="State" Width="*" Binding="{Binding State}" />
+                            <DataGridTextColumn Header="Arrival" Width="Auto" Binding="{Binding ArrivalTime}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+        
+                    <DataGrid Grid.Row="1" Grid.Column="0"
+                              Margin="0,10,5,0"
+                              IsVisible="{Binding IsSelectedOrder}"
+                              ItemsSource="{Binding SelectedOrderFurnitureItems}"
+                              SelectionMode="Single"
+                              CanUserSortColumns="False"
+                              IsReadOnly="True"
+                              GridLinesVisibility="All"
+                              RowHeight="24"
+                              BorderThickness="1" BorderBrush="Gray">
+        
+                        <DataGrid.Styles>
+                            <Style Selector="DataGridColumnHeader">
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Style>
+                            <Style Selector="DataGridCell:current /template/ Grid#FocusVisual">
+                                <Setter Property="IsVisible" Value="false" />
+                            </Style>
+                        </DataGrid.Styles>
+        
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="#" Width="Auto" Binding="{Binding Id}" />
+                            <DataGridTextColumn Header="Type" Width="Auto" Binding="{Binding Type}" />
+                            <DataGridTextColumn Header="State" Width="*" Binding="{Binding State}" />
+                            <DataGridTextColumn Header="Worker" Width="Auto" Binding="{Binding Worker}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+        
+                </Grid>
+            </TabItem>
+            <TabItem Header="Assembly lines" FontSize="16" FontWeight="Bold">
+                <Grid
+                    RowDefinitions="*"
+                    ColumnDefinitions="*"
+                    Margin="0,5,0,0">
+        
+                    <DataGrid Grid.Row="0" Grid.Column="0"
+                              Margin="0,0,5,0"
+                              ItemsSource="{Binding AssemblyLines}"
+                              SelectionMode="Single"
+                              CanUserSortColumns="False"
+                              IsReadOnly="True"
+                              GridLinesVisibility="All"
+                              RowHeight="24"
+                              BorderThickness="1" BorderBrush="Gray">
+        
+                        <DataGrid.Styles>
+                            <Style Selector="DataGridColumnHeader">
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Style>
+                            <Style Selector="DataGridCell:current /template/ Grid#FocusVisual">
+                                <Setter Property="IsVisible" Value="false" />
+                            </Style>
+                        </DataGrid.Styles>
+        
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn Header="ID" Width="Auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0">
+                                            <TextBlock
+                                                Text="●"
+                                                Margin="0,0,3,0"
+                                                Foreground="{Binding StatusColor}" />
+                                            <TextBlock Text="{Binding Id}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="Order" Width="Auto"  Binding="{Binding CurrentOrder}" />
+                            <DataGridTextColumn Header="State" Width="*" Binding="{Binding State}" />
+                            <DataGridTextColumn Header="Worker" Width="Auto" Binding="{Binding CurrentWorker}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+        
+                </Grid>
+            </TabItem>
+        </TabControl>
+        
+        <Grid 
+            Grid.Row="0" Grid.Column="1"
+            RowDefinitions="Auto,*">
+            
+            <Label
+                Grid.Row="0" Grid.Column="0"
+                Margin="0,10,0,17"
+                FontSize="16"
+                FontFamily="Source Code Pro"
+                FontWeight="Bold"
+                Content="Animation" />
+            <Border 
+                Grid.Row="1" Grid.Column="0" 
+                BorderBrush="Gray"
+                BorderThickness="1" Margin="0,0,0,0">
+            <ScrollViewer
+                VerticalScrollBarVisibility="Auto">
+                
+                    <!-- <ItemsControl Items="{Binding AnimationWorkers}"> -->
+                    <!--     <ItemsControl.ItemsPanel> -->
+                    <!--         <ItemsPanelTemplate> -->
+                    <!--             <Canvas Width="1000" Height="1000" Background="LightGray"/> -->
+                    <!--         </ItemsPanelTemplate> -->
+                    <!--     </ItemsControl.ItemsPanel> -->
+                    <!-- -->
+                    <!--     <ItemsControl.ItemTemplate> -->
+                    <!--         <DataTemplate> -->
+                    <!--             <Rectangle Width="{Binding Width}" Height="{Binding Height}" Fill="{Binding Fill}"> -->
+                    <!--                 <Canvas.Left> -->
+                    <!--                     <Binding Path="X"/> -->
+                    <!--                 </Canvas.Left> -->
+                    <!--                 <Canvas.Top> -->
+                    <!--                     <Binding Path="Y"/> -->
+                    <!--                 </Canvas.Top> -->
+                    <!--             </Rectangle> -->
+                    <!--         </DataTemplate> -->
+                    <!--     </ItemsControl.ItemTemplate> -->
+                    <!-- </ItemsControl> -->
+                    
+                    <Canvas Height="1000" x:Name="AnimationCanvas">
+                
+                        <Label
+                            Content="Warehouse"
+                            FontSize="12"
+                            FontFamily="Source Code Pro"
+                            FontWeight="Bold"
+                            Foreground="#ad9050"
+                            Canvas.Right="50" Canvas.Top="0"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center" />
+                        <Rectangle Fill="#ad9050" Opacity="0.5" 
+                                   Height="100" Width="100" 
+                                   RadiusX="5" RadiusY="5"
+                                   Canvas.Right="20" Canvas.Top="20" />
+                        
+                        <Label
+                            Content="Assembly line 1"
+                            FontSize="12"
+                            FontFamily="Source Code Pro"
+                            FontWeight="Bold"
+                            Foreground="#3c4bc9"
+                            Canvas.Left="20" Canvas.Top="0"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center" />
+                        <Rectangle Fill="#3c4bc9" Height="60" Width="100" RadiusX="5" RadiusY="5"
+                                   Canvas.Left="20" Canvas.Top="20" Opacity="0.5" />
+                        <Label
+                            Content="Assembly of fittings..."
+                            FontSize="12"
+                            FontFamily="Source Code Pro"
+                            FontWeight="Bold"
+                            Foreground="#3c4bc9"
+                            Canvas.Left="20" Canvas.Top="77"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center" />
+                        
+                        <Rectangle Fill="#3c4bc9" Height="40" Width="40" RadiusX="5" RadiusY="5"
+                                   Canvas.Left="30" Canvas.Top="30"/>
+                        <Label
+                            Canvas.Left="30" Canvas.Top="27"
+                            Content="9999"
+                            FontSize="16"
+                            FontFamily="Source Code Pro"
+                            Foreground="White"
+                            Width="40"
+                            HorizontalContentAlignment="Center" 
+                            VerticalContentAlignment="Center" />
+                        <Label
+                            Canvas.Left="30" Canvas.Top="43"
+                            Content="[5]"
+                            FontSize="16"
+                            FontFamily="Source Code Pro"
+                            Foreground="White"
+                            Width="40"
+                            HorizontalContentAlignment="Center" 
+                            VerticalContentAlignment="Center" />
+                        
+                        <Ellipse 
+                            Fill="Red" Height="30" Width="30"
+                            Canvas.Left="80" Canvas.Top="35"/>
+                        <Label
+                            Canvas.Left="80" Canvas.Top="35"
+                            Content="A2"
+                            FontSize="16"
+                            FontFamily="Source Code Pro"
+                            FontWeight="Bold"
+                            Foreground="White"
+                            Height="30" Width="30"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center" />
+                        
+                        <Ellipse 
+                            Fill="Green" Height="30" Width="30"
+                            Canvas.Left="130" Canvas.Top="35"/>
+                        <Label
+                            Canvas.Left="130" Canvas.Top="35"
+                            Content="B1"
+                            FontSize="16"
+                            FontFamily="Source Code Pro"
+                            FontWeight="Bold"
+                            Foreground="White"
+                            Height="30" Width="30"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center" />
+                
+                    </Canvas>
+                </ScrollViewer>
+            </Border>
+            
+        </Grid>
+
+        <TabControl Grid.Row="0" Grid.RowSpan="2" Grid.Column="2" Margin="0,0,0,0">
+            <TabItem Header="Statistics" FontSize="16" FontWeight="Bold">
+                <Grid
+                    RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" 
+                    ColumnDefinitions="Auto,*,Auto"
+                    Margin="-4,5,0,0">
+                
+                    <SelectableTextBlock
+                        Grid.Row="0" Grid.Column="0"
+                        Margin="5,0,0,10"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="Order processing time" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="0" Grid.Column="1"
+                        Margin="0,0,0,10"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        HorizontalAlignment="Center"
+                        Text="{Binding ReplicationOrderProcessingTime}" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="0" Grid.Column="2"
+                        Margin="0,0,10,10"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="{Binding Shared.SelectedTimeUnits}" >
+                        
+                        <SelectableTextBlock.ContextMenu>
+                            <ContextMenu >
+                                <MenuItem Header="seconds" Click="MenuItem_OnClick" />
+                                <MenuItem Header="minutes" Click="MenuItem_OnClick" />
+                                <MenuItem Header="hours" Click="MenuItem_OnClick" />
+                            </ContextMenu>
+                        </SelectableTextBlock.ContextMenu>
+                        
+                    </SelectableTextBlock>
+                    
+                    <SelectableTextBlock
+                        Grid.Row="1" Grid.Column="0"
+                        Margin="5,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="Pending orders" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="1" Grid.Column="1"
+                        Margin="0,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        HorizontalAlignment="Center"
+                        Text="{Binding ReplicationPendingOrders}" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="1" Grid.Column="2"
+                        Margin="0,0,10,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="orders" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="2" Grid.Column="0"
+                        Margin="5,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="Pending furniture items" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="2" Grid.Column="1"
+                        Margin="0,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        HorizontalAlignment="Center"
+                        Text="{Binding ReplicationPendingFurnitureItems}" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="2" Grid.Column="2"
+                        Margin="0,0,10,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="items" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="3" Grid.Column="0"
+                        Margin="5,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="Pending items for staining" />
+            
+                    <SelectableTextBlock
+                        Grid.Row="3" Grid.Column="1"
+                        Margin="0,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        HorizontalAlignment="Center"
+                        Text="{Binding ReplicationPendingItemsForStaining}" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="3" Grid.Column="2"
+                        Margin="0,0,10,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="items" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="4" Grid.Column="0"
+                        Margin="5,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="Pending items for varnishing" />
+            
+                    <SelectableTextBlock
+                        Grid.Row="4" Grid.Column="1"
+                        Margin="0,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        HorizontalAlignment="Center"
+                        Text="{Binding ReplicationPendingItemsForVarnishing}" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="4" Grid.Column="2"
+                        Margin="0,0,10,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="items" />
+                        
+                    <SelectableTextBlock
+                        Grid.Row="5" Grid.Column="0"
+                        Margin="5,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="Pending items for folding" />
+            
+                    <SelectableTextBlock
+                        Grid.Row="5" Grid.Column="1"
+                        Margin="0,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        HorizontalAlignment="Center"
+                        Text="{Binding ReplicationPendingItemsForFolding}" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="5" Grid.Column="2"
+                        Margin="0,0,10,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="items" />
+                        
+                    <SelectableTextBlock
+                        Grid.Row="6" Grid.Column="0"
+                        Margin="5,0,0,10"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="Pending closets for fittings" />
+            
+                    <SelectableTextBlock
+                        Grid.Row="6" Grid.Column="1"
+                        Margin="0,0,0,10"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        HorizontalAlignment="Center"
+                        Text="{Binding ReplicationPendingItemsForFittings}" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="6" Grid.Column="2"
+                        Margin="0,0,10,10"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="items" />
+
+                    <SelectableTextBlock
+                        Grid.Row="7" Grid.Column="0"
+                        Margin="5,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="Waiting time pending orders" />
+            
+                    <SelectableTextBlock
+                        Grid.Row="7" Grid.Column="1"
+                        Margin="0,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        HorizontalAlignment="Center"
+                        Text="{Binding ReplicationPendingOrdersWaitingTime}" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="7" Grid.Column="2"
+                        Margin="0,0,10,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="{Binding Shared.SelectedTimeUnits}" >
+                        
+                        <SelectableTextBlock.ContextMenu>
+                            <ContextMenu >
+                                <MenuItem Header="seconds" Click="MenuItem_OnClick" />
+                                <MenuItem Header="minutes" Click="MenuItem_OnClick" />
+                                <MenuItem Header="hours" Click="MenuItem_OnClick" />
+                            </ContextMenu>
+                        </SelectableTextBlock.ContextMenu>
+                        
+                    </SelectableTextBlock>
+                    
+                    <SelectableTextBlock
+                        Grid.Row="8" Grid.Column="0"
+                        Margin="5,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="Waiting time pending items" />
+            
+                    <SelectableTextBlock
+                        Grid.Row="8" Grid.Column="1"
+                        Margin="0,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        HorizontalAlignment="Center"
+                        Text="{Binding ReplicationPendingFurnitureItemsWaitingTime}" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="8" Grid.Column="2"
+                        Margin="0,0,10,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="{Binding Shared.SelectedTimeUnits}" >
+                        
+                        <SelectableTextBlock.ContextMenu>
+                            <ContextMenu >
+                                <MenuItem Header="seconds" Click="MenuItem_OnClick" />
+                                <MenuItem Header="minutes" Click="MenuItem_OnClick" />
+                                <MenuItem Header="hours" Click="MenuItem_OnClick" />
+                            </ContextMenu>
+                        </SelectableTextBlock.ContextMenu>
+                        
+                    </SelectableTextBlock>
+
+                    <SelectableTextBlock
+                        Grid.Row="9" Grid.Column="0"
+                        Margin="5,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="Waiting time items for staining" />
+            
+                    <SelectableTextBlock
+                        Grid.Row="9" Grid.Column="1"
+                        Margin="0,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        HorizontalAlignment="Center"
+                        Text="{Binding ReplicationPendingItemsForStainingWaitingTime}" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="9" Grid.Column="2"
+                        Margin="0,0,10,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="{Binding Shared.SelectedTimeUnits}" >
+                        
+                        <SelectableTextBlock.ContextMenu>
+                            <ContextMenu >
+                                <MenuItem Header="seconds" Click="MenuItem_OnClick" />
+                                <MenuItem Header="minutes" Click="MenuItem_OnClick" />
+                                <MenuItem Header="hours" Click="MenuItem_OnClick" />
+                            </ContextMenu>
+                        </SelectableTextBlock.ContextMenu>
+                        
+                    </SelectableTextBlock>
+                    
+                    <SelectableTextBlock
+                        Grid.Row="10" Grid.Column="0"
+                        Margin="5,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="Waiting time items for varnishing" />
+            
+                    <SelectableTextBlock
+                        Grid.Row="10" Grid.Column="1"
+                        Margin="0,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        HorizontalAlignment="Center"
+                        Text="{Binding ReplicationPendingItemsForVarnishingWaitingTime}" />
+
+                    <SelectableTextBlock
+                        Grid.Row="10" Grid.Column="2"
+                        Margin="0,0,10,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="{Binding Shared.SelectedTimeUnits}" >
+                        
+                        <SelectableTextBlock.ContextMenu>
+                            <ContextMenu >
+                                <MenuItem Header="seconds" Click="MenuItem_OnClick" />
+                                <MenuItem Header="minutes" Click="MenuItem_OnClick" />
+                                <MenuItem Header="hours" Click="MenuItem_OnClick" />
+                            </ContextMenu>
+                        </SelectableTextBlock.ContextMenu>
+                        
+                    </SelectableTextBlock>
+                        
+                    <SelectableTextBlock
+                        Grid.Row="11" Grid.Column="0"
+                        Margin="5,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="Waiting time items for folding" />
+            
+                    <SelectableTextBlock
+                        Grid.Row="11" Grid.Column="1"
+                        Margin="0,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        HorizontalAlignment="Center"
+                        Text="{Binding ReplicationPendingItemsForFoldingWaitingTime}" />
+
+                    <SelectableTextBlock
+                        Grid.Row="11" Grid.Column="2"
+                        Margin="0,0,10,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="{Binding Shared.SelectedTimeUnits}" >
+                        
+                        <SelectableTextBlock.ContextMenu>
+                            <ContextMenu >
+                                <MenuItem Header="seconds" Click="MenuItem_OnClick" />
+                                <MenuItem Header="minutes" Click="MenuItem_OnClick" />
+                                <MenuItem Header="hours" Click="MenuItem_OnClick" />
+                            </ContextMenu>
+                        </SelectableTextBlock.ContextMenu>
+                        
+                    </SelectableTextBlock>
+                        
+                    <SelectableTextBlock
+                        Grid.Row="12" Grid.Column="0"
+                        Margin="5,0,0,10"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="Waiting time closets for fittings" />
+            
+                    <SelectableTextBlock
+                        Grid.Row="12" Grid.Column="1"
+                        Margin="0,0,0,10"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        HorizontalAlignment="Center"
+                        Text="{Binding ReplicationPendingItemsForFittingsWaitingTime}" />
+
+                    <SelectableTextBlock
+                        Grid.Row="12" Grid.Column="2"
+                        Margin="0,0,10,10"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="{Binding Shared.SelectedTimeUnits}" >
+                        
+                        <SelectableTextBlock.ContextMenu>
+                            <ContextMenu >
+                                <MenuItem Header="seconds" Click="MenuItem_OnClick" />
+                                <MenuItem Header="minutes" Click="MenuItem_OnClick" />
+                                <MenuItem Header="hours" Click="MenuItem_OnClick" />
+                            </ContextMenu>
+                        </SelectableTextBlock.ContextMenu>
+                        
+                    </SelectableTextBlock>
+                    
+                    <SelectableTextBlock
+                        Grid.Row="13" Grid.Column="0"
+                        Margin="5,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="Workers group A utilization" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="13" Grid.Column="1"
+                        Margin="0,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        HorizontalAlignment="Center"
+                        Text="{Binding ReplicationWorkersGroupAUtilization}" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="13" Grid.Column="2"
+                        Margin="0,0,10,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="%" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="14" Grid.Column="0"
+                        Margin="5,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="Workers group B utilization" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="14" Grid.Column="1"
+                        Margin="0,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        HorizontalAlignment="Center"
+                        Text="{Binding ReplicationWorkersGroupBUtilization}" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="14" Grid.Column="2"
+                        Margin="0,0,10,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="%" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="15" Grid.Column="0"
+                        Margin="5,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="Workers group C utilization" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="15" Grid.Column="1"
+                        Margin="0,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        HorizontalAlignment="Center"
+                        Text="{Binding ReplicationWorkersGroupCUtilization}" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="15" Grid.Column="2"
+                        Margin="0,0,10,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="%" />
+                </Grid>
+            </TabItem>
+            <TabItem Header="Parameters" FontSize="16" FontWeight="Bold">
+                <Grid Margin="-4,10,0,0"
+                    RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
+                    <StackPanel
+                        Grid.Row="0" Grid.Column="0"
+                        Orientation="Horizontal" HorizontalAlignment="Left">
+                        <Label
+                            VerticalAlignment="Center"
+                            Margin="0,0,10,0" >Sleep time</Label>
+                    
+                        <TextBox
+                            Margin="0,0,10,0"
+                            Text="{Binding SleepTime}"
+                            IsEnabled="{Binding Shared.IsStartSimulationButtonEnabled}"
+                            Height="20"
+                            Width="115" />
+                    
+                        <Label
+                            VerticalAlignment="Center"
+                            Margin="0,0,10,0" >Delta</Label>
+                    
+                        <TextBox
+                            Margin="0,0,0,0"
+                            Text="{Binding Delta}"
+                            IsEnabled="false"
+                            Height="20"
+                            Width="115" />
+                    </StackPanel>
+                    
+                    <Label
+                        Grid.Row="1" Grid.Column="0"
+                        Margin="0,10,10,5"
+                        FontSize="16"
+                        FontWeight="Bold"
+                        FontFamily="Source Code Pro"
+                        Content="Assembly lines" />
+                    
+                    <StackPanel
+                        Grid.Row="2" Grid.Column="0"
+                        Orientation="Horizontal" HorizontalAlignment="Left">
+                        <Label Margin="0,5,0,0">Count</Label>
+                        <TextBox
+                            Margin="10,0,0,0"
+                            IsEnabled="{Binding Shared.IsStartSimulationButtonEnabled}"
+                            Text="{Binding Shared.CountOfAssemblyLines}"
+                            Height="20"
+                            Width="40" />
+                    </StackPanel>
+                    
+                    <Label
+                        Grid.Row="3" Grid.Column="0"
+                        Margin="0,10,10,5"
+                        FontSize="16"
+                        FontWeight="Bold"
+                        FontFamily="Source Code Pro"
+                        Content="Workers count" />
+                    
+                    <StackPanel
+                        Grid.Row="4" Grid.Column="0"
+                        Orientation="Horizontal" HorizontalAlignment="Left">
+                        <Label Margin="0,5,0,0">A</Label>
+                        <TextBox
+                            Margin="10,0,0,0"
+                            IsEnabled="{Binding Shared.IsStartSimulationButtonEnabled}"
+                            Text="{Binding Shared.CountOfWorkersGroupA}"
+                            Height="20"
+                            Width="40" />
+                    
+                        <Label Margin="10,5,0,0">B</Label>
+                        <TextBox
+                            Margin="10,0,0,0"
+                            IsEnabled="{Binding Shared.IsStartSimulationButtonEnabled}"
+                            Text="{Binding Shared.CountOfWorkersGroupB}"
+                            Height="20"
+                            Width="40" />
+                    
+                        <Label Margin="10,5,0,0">C</Label>
+                        <TextBox
+                            Margin="10,0,0,0"
+                            IsEnabled="{Binding Shared.IsStartSimulationButtonEnabled}"
+                            Text="{Binding Shared.CountOfWorkersGroupC}"
+                            Height="20"
+                            Width="40" />
+                    </StackPanel>
+                    
+                    <CheckBox
+                        Grid.Row="5" Grid.Column="0"
+                        IsChecked="{Binding Shared.EnableWorkerLocationPreference}"
+                        IsEnabled="{Binding Shared.IsStartSimulationButtonEnabled}"
+                        Margin="0,10,20,0">Worker location preference</CheckBox>
+                </Grid>
+            </TabItem>
+        </TabControl>
+        
+        <Grid
+            Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
+            RowDefinitions="*" ColumnDefinitions="*,*"
+            Margin="0,10,0,10">
+            
+            <TabControl Grid.Row="0" Grid.Column="0">
+                <TabItem Header="Workers group A" FontSize="14" FontWeight="Medium">
+                    <DataGrid
+                          ItemsSource="{Binding WorkersGroupA}"
+                          SelectionMode="Single"
+                          CanUserSortColumns="False"
+                          IsReadOnly="True"
+                          GridLinesVisibility="All"
+                          RowHeight="24"
+                          BorderThickness="1" BorderBrush="Gray">
+            
+                        <DataGrid.Styles>
+                            <Style Selector="DataGridColumnHeader">
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Style>
+                            <Style Selector="DataGridCell:current /template/ Grid#FocusVisual"> 
+                                <Setter Property="IsVisible" Value="false" /> 
+                            </Style> 
+                        </DataGrid.Styles>
+            
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn Header="ID" Width="Auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0">
+                                            <TextBlock 
+                                                Text="●" 
+                                                Margin="0,0,3,0"
+                                                Foreground="{Binding StatusColor}" />
+                                            <TextBlock Text="{Binding Id}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="Place" Width="Auto" Binding="{Binding Place}" />
+                            <DataGridTextColumn Header="State" Width="*" Binding="{Binding State}" />
+                            <DataGridTextColumn Header="Order" Width="Auto" Binding="{Binding Furniture}" />
+                            <DataGridTextColumn Header="Utilization" Width="Auto" Binding="{Binding Utilization}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </TabItem>
+                <TabItem Header="Workers group B" FontSize="14" FontWeight="Medium">
+                    <DataGrid 
+                          ItemsSource="{Binding WorkersGroupB}"
+                          SelectionMode="Single"
+                          CanUserSortColumns="False"
+                          IsReadOnly="True"
+                          GridLinesVisibility="All"
+                          RowHeight="24"
+                          BorderThickness="1" BorderBrush="Gray">
+            
+                        <DataGrid.Styles>
+                            <Style Selector="DataGridColumnHeader">
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Style>
+                            <Style Selector="DataGridCell:current /template/ Grid#FocusVisual"> 
+                                <Setter Property="IsVisible" Value="false" /> 
+                            </Style> 
+                        </DataGrid.Styles>
+            
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn Header="ID" Width="Auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0">
+                                            <TextBlock 
+                                                Text="●" 
+                                                Margin="0,0,3,0"
+                                                Foreground="{Binding StatusColor}" />
+                                            <TextBlock Text="{Binding Id}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="Place" Width="Auto" Binding="{Binding Place}" />
+                            <DataGridTextColumn Header="State" Width="*" Binding="{Binding State}" />
+                            <DataGridTextColumn Header="Order" Width="Auto" Binding="{Binding Furniture}" />
+                            <DataGridTextColumn Header="Utilization" Width="Auto" Binding="{Binding Utilization}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </TabItem>
+                <TabItem Header="Workers group C" FontSize="14" FontWeight="Medium">
+                    <DataGrid
+                          ItemsSource="{Binding WorkersGroupC}"
+                          SelectionMode="Single"
+                          CanUserSortColumns="False"
+                          IsReadOnly="True"
+                          GridLinesVisibility="All"
+                          RowHeight="24"
+                          BorderThickness="1" BorderBrush="Gray">
+            
+                        <DataGrid.Styles>
+                            <Style Selector="DataGridColumnHeader">
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Style>
+                            <Style Selector="DataGridCell:current /template/ Grid#FocusVisual"> 
+                                <Setter Property="IsVisible" Value="false" /> 
+                            </Style> 
+                        </DataGrid.Styles>
+            
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn Header="ID" Width="Auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0">
+                                            <TextBlock 
+                                                Text="●" 
+                                                Margin="0,0,3,0"
+                                                Foreground="{Binding StatusColor}" />
+                                            <TextBlock Text="{Binding Id}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="Place" Width="Auto" Binding="{Binding Place}" />
+                            <DataGridTextColumn Header="State" Width="*" Binding="{Binding State}" />
+                            <DataGridTextColumn Header="Order" Width="Auto" Binding="{Binding Furniture}" />
+                            <DataGridTextColumn Header="Utilization" Width="Auto" Binding="{Binding Utilization}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </TabItem>
+            </TabControl>
+            
+            <TabControl Grid.Row="0" Grid.Column="1">
+                <TabItem Header="{Binding PendingOrdersQueueTabTitle}" FontSize="14" FontWeight="Medium">
+                    <DataGrid
+                          ItemsSource="{Binding PendingOrdersQueue}"
+                          SelectionMode="Single"
+                          CanUserSortColumns="False"
+                          IsReadOnly="True" 
+                          GridLinesVisibility="All"
+                          RowHeight="24"
+                          BorderThickness="1" BorderBrush="Gray">
+            
+                        <DataGrid.Styles>
+                            <Style Selector="DataGridColumnHeader">
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Style>
+                            <Style Selector="DataGridCell:current /template/ Grid#FocusVisual"> 
+                                <Setter Property="IsVisible" Value="false" /> 
+                            </Style> 
+                        </DataGrid.Styles>
+            
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="#" Width="Auto" Binding="{Binding Id}" />
+                            <DataGridTextColumn Header="State" Width="*" Binding="{Binding State}" />
+                            <DataGridTextColumn Header="Waiting time" Width="Auto" Binding="{Binding WaitingTime}" />
+                            <DataGridTextColumn Header="Arrival" Width="Auto" Binding="{Binding ArrivalTime}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </TabItem>
+                <TabItem Header="{Binding PendingFurnitureItemsQueueTabTitle}" FontSize="14" FontWeight="Medium">
+                    <DataGrid
+                        ItemsSource="{Binding PendingFurnitureItemsQueue}"
+                        SelectionMode="Single"
+                        CanUserSortColumns="False"
+                        IsReadOnly="True" 
+                        GridLinesVisibility="All"
+                        RowHeight="24"
+                        BorderThickness="1" BorderBrush="Gray">
+            
+                        <DataGrid.Styles>
+                            <Style Selector="DataGridColumnHeader">
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Style>
+                            <Style Selector="DataGridCell:current /template/ Grid#FocusVisual"> 
+                                <Setter Property="IsVisible" Value="false" /> 
+                            </Style> 
+                        </DataGrid.Styles>
+            
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="#" Width="Auto" Binding="{Binding DisplayId}" />
+                            <DataGridTextColumn Header="Type" Width="Auto" Binding="{Binding Type}" />
+                            <DataGridTextColumn Header="State" Width="*" Binding="{Binding State}" />
+                            <DataGridTextColumn Header="Waiting time" Width="Auto" Binding="{Binding WaitingTime}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </TabItem>
+                <TabItem Header="{Binding PendingForStainingQueueTabTitle}" FontSize="14" FontWeight="Medium">
+                    <DataGrid
+                        ItemsSource="{Binding PendingForStainingQueue}"
+                        SelectionMode="Single"
+                        CanUserSortColumns="False"
+                        IsReadOnly="True" 
+                        GridLinesVisibility="All"
+                        RowHeight="24"
+                        BorderThickness="1" BorderBrush="Gray">
+            
+                        <DataGrid.Styles>
+                            <Style Selector="DataGridColumnHeader">
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Style>
+                            <Style Selector="DataGridCell:current /template/ Grid#FocusVisual"> 
+                                <Setter Property="IsVisible" Value="false" /> 
+                            </Style> 
+                        </DataGrid.Styles>
+            
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="#" Width="Auto" Binding="{Binding DisplayId}" />
+                            <DataGridTextColumn Header="Type" Width="Auto" Binding="{Binding Type}" />
+                            <DataGridTextColumn Header="State" Width="*" Binding="{Binding State}" />
+                            <DataGridTextColumn Header="Waiting time" Width="Auto" Binding="{Binding WaitingTime}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </TabItem>
+                <TabItem Header="{Binding PendingForVarnishingQueueTabTitle}" FontSize="14" FontWeight="Medium">
+                    <DataGrid
+                        ItemsSource="{Binding PendingForVarnishingQueue}"
+                        SelectionMode="Single"
+                        CanUserSortColumns="False"
+                        IsReadOnly="True"
+                        GridLinesVisibility="All"
+                        RowHeight="24"
+                        BorderThickness="1" BorderBrush="Gray">
+            
+                        <DataGrid.Styles>
+                            <Style Selector="DataGridColumnHeader">
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Style>
+                            <Style Selector="DataGridCell:current /template/ Grid#FocusVisual"> 
+                                <Setter Property="IsVisible" Value="false" /> 
+                            </Style> 
+                        </DataGrid.Styles>
+            
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="#" Width="Auto" Binding="{Binding DisplayId}" />
+                            <DataGridTextColumn Header="Type" Width="Auto" Binding="{Binding Type}" />
+                            <DataGridTextColumn Header="State" Width="*" Binding="{Binding State}" />
+                            <DataGridTextColumn Header="Waiting time" Width="Auto" Binding="{Binding WaitingTime}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </TabItem>
+                <TabItem Header="{Binding PendingForFoldingQueueTabTitle}" FontSize="14" FontWeight="Medium">
+                    <DataGrid
+                        ItemsSource="{Binding PendingForFoldingQueue}"
+                        SelectionMode="Single"
+                        CanUserSortColumns="False"
+                        IsReadOnly="True" 
+                        GridLinesVisibility="All"
+                        RowHeight="24"
+                        BorderThickness="1" BorderBrush="Gray">
+            
+                        <DataGrid.Styles>
+                            <Style Selector="DataGridColumnHeader">
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Style>
+                            <Style Selector="DataGridCell:current /template/ Grid#FocusVisual"> 
+                                <Setter Property="IsVisible" Value="false" /> 
+                            </Style> 
+                        </DataGrid.Styles>
+            
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="#" Width="Auto" Binding="{Binding DisplayId}" />
+                            <DataGridTextColumn Header="Type" Width="Auto" Binding="{Binding Type}" />
+                            <DataGridTextColumn Header="State" Width="*" Binding="{Binding State}" />
+                            <DataGridTextColumn Header="Waiting time" Width="Auto" Binding="{Binding WaitingTime}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </TabItem>
+                <TabItem Header="{Binding PendingForFittingsQueueTabTitle}" FontSize="14" FontWeight="Medium">
+                    <DataGrid
+                        ItemsSource="{Binding PendingForFittingsQueue}"
+                        SelectionMode="Single"
+                        CanUserSortColumns="False"
+                        IsReadOnly="True" 
+                        GridLinesVisibility="All"
+                        RowHeight="24"
+                        BorderThickness="1" BorderBrush="Gray">
+            
+                        <DataGrid.Styles>
+                            <Style Selector="DataGridColumnHeader">
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Style>
+                            <Style Selector="DataGridCell:current /template/ Grid#FocusVisual"> 
+                                <Setter Property="IsVisible" Value="false" /> 
+                            </Style> 
+                        </DataGrid.Styles>
+            
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="#" Width="Auto" Binding="{Binding DisplayId}" />
+                            <DataGridTextColumn Header="Type" Width="Auto" Binding="{Binding Type}" />
+                            <DataGridTextColumn Header="State" Width="*" Binding="{Binding State}" />
+                            <DataGridTextColumn Header="Waiting time" Width="Auto" Binding="{Binding WaitingTime}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </TabItem>
+            </TabControl>
+            
+        </Grid>
+        
+    </Grid>
+    
+</UserControl>

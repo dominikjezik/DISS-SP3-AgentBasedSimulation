@@ -14,21 +14,21 @@ public class MaterialDeliveredToLine : FurnitureManufacturerBaseEvent
     {
         // Pracovník dorazil na linku, začína sa výroba - rezanie materiálu
         CurrentWorker.IsMovingToAssemblyLine = false;
-        CurrentWorker.CurrentOrder.State = "Cutting material";
+        CurrentWorker.CurrentFurniture.State = "Cutting material";
 
         // Vyhľadáme voľnú linku (od najmenšieho id), pričom
         // ak nie je žiadna voľná tak sa "vytvorí" nová linka
         var availableAssemblyLine = Simulation.RequestFreeAssemblyLine();
         
-        availableAssemblyLine.CurrentOrder = CurrentWorker.CurrentOrder;
-        CurrentWorker.CurrentOrder.CurrentAssemblyLine = availableAssemblyLine;
+        availableAssemblyLine.CurrentFurniture = CurrentWorker.CurrentFurniture;
+        CurrentWorker.CurrentFurniture.CurrentAssemblyLine = availableAssemblyLine;
         availableAssemblyLine.CurrentWorker = CurrentWorker;
         CurrentWorker.CurrentAssemblyLine = availableAssemblyLine;
         
         // Naplanovanie dokončenia rezania materiálu
         double cuttingTime;
         
-        switch (CurrentWorker.CurrentOrder.Type)
+        switch (CurrentWorker.CurrentFurniture.Type)
         {
             case FurnitureType.Desk:
                 cuttingTime = Simulation.CuttingDeskTimeGenerator.Next();

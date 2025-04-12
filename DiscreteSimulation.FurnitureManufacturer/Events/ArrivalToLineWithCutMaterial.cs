@@ -19,12 +19,12 @@ public class ArrivalToLineWithCutMaterial : FurnitureManufacturerBaseEvent
         CurrentWorker.IsMovingToAssemblyLine = false;
         CurrentWorker.CurrentAssemblyLine = CurrentAssemblyLine;
         CurrentAssemblyLine.CurrentWorker = CurrentWorker;
-        CurrentWorker.CurrentOrder.State = "Varnishing";
+        CurrentWorker.CurrentFurniture.State = "Varnishing";
         
         // Naplanovanie dokončenia morenia a lakovania materiálu
         double varnishingTime;
         
-        switch (CurrentWorker.CurrentOrder.Type)
+        switch (CurrentWorker.CurrentFurniture.Type)
         {
             case FurnitureType.Desk:
                 varnishingTime = Simulation.VarnishingDeskTimeGenerator.Next();

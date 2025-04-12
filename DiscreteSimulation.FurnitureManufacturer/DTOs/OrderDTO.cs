@@ -7,9 +7,8 @@ namespace DiscreteSimulation.FurnitureManufacturer.DTOs;
 public class OrderDTO : INotifyPropertyChanged, IUpdatable<OrderDTO>
 {
     private int _id;
-    private FurnitureType _type;
+    private string _countOfFurnitureItems;
     private string _state;
-    private string _place;
     private string _arrivalTime;
     private string _waitingTime;
 
@@ -23,15 +22,17 @@ public class OrderDTO : INotifyPropertyChanged, IUpdatable<OrderDTO>
             OnPropertyChanged(nameof(Id));
         }
     }
+    
+    public List<FurnitureDTO> FurnitureItems { get; set; } = new();
 
-    public FurnitureType Type
+    public string CountOfFurnitureItems
     {
-        get => _type;
+        get => _countOfFurnitureItems;
         set
         {
-            if (value == _type) return;
-            _type = value;
-            OnPropertyChanged(nameof(Type));
+            if (value == _countOfFurnitureItems) return;
+            _countOfFurnitureItems = value;
+            OnPropertyChanged(nameof(CountOfFurnitureItems));
         }
     }
 
@@ -43,17 +44,6 @@ public class OrderDTO : INotifyPropertyChanged, IUpdatable<OrderDTO>
             if (value == _state) return;
             _state = value;
             OnPropertyChanged(nameof(State));
-        }
-    }
-
-    public string Place
-    {
-        get => _place;
-        set
-        {
-            if (value == _place) return;
-            _place = value;
-            OnPropertyChanged(nameof(Place));
         }
     }
 
@@ -82,7 +72,8 @@ public class OrderDTO : INotifyPropertyChanged, IUpdatable<OrderDTO>
     public void Update(Order order, double currentSimulationTime)
     {
         Id = order.Id;
-        Type = order.Type;
+        FurnitureItems = order.FurnitureItems.Select(f => f.ToDTO(currentSimulationTime)).ToList();
+        CountOfFurnitureItems = $"{order.FinishedFurnitureItemsCount}/{order.FurnitureItemsCount}";
         State = order.State;
         ArrivalTime = order.ArrivalTime.ToString("F2");
         WaitingTime = (currentSimulationTime - order.StartedWaitingTime).FormatToSimulationTime(timeOnly: true);
@@ -91,7 +82,8 @@ public class OrderDTO : INotifyPropertyChanged, IUpdatable<OrderDTO>
     public void Update(OrderDTO orderDTO)
     {
         Id = orderDTO.Id;
-        Type = orderDTO.Type;
+        FurnitureItems = orderDTO.FurnitureItems;
+        CountOfFurnitureItems = orderDTO.CountOfFurnitureItems;
         State = orderDTO.State;
         ArrivalTime = orderDTO.ArrivalTime.FormatToSimulationTime(shortFormat: true);
         WaitingTime = orderDTO.WaitingTime;

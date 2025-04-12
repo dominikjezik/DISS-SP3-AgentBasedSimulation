@@ -12,7 +12,7 @@ public class Worker
     
     private double _lastChangeInUtilizationTime = 0;
     
-    private Order? _currentOrder;
+    private Furniture? _currentFurniture;
 
     public Worker(FurnitureManufacturerSimulation furnitureManufacturerSimulation)
     {
@@ -23,12 +23,12 @@ public class Worker
     
     public WorkerGroup Group { get; set; }
     
-    public Order? CurrentOrder
+    public Furniture? CurrentFurniture
     {
-        get => _currentOrder;
+        get => _currentFurniture;
         set {
             RefreshStatistics();
-            _currentOrder = value;
+            _currentFurniture = value;
         }
     }
 
@@ -55,7 +55,7 @@ public class Worker
         }
     }
     
-    public bool IsBusy => CurrentOrder != null;
+    public bool IsBusy => CurrentFurniture != null;
 
     public bool IsInWarehouse { get; set; }
     
@@ -71,7 +71,7 @@ public class Worker
     {
         var timeInterval = _furnitureManufacturerSimulation.SimulationTime - _lastChangeInUtilizationTime;
         
-        _utilizationStatistics.AddValue(CurrentOrder != null ? 1 : 0, timeInterval);
+        _utilizationStatistics.AddValue(CurrentFurniture != null ? 1 : 0, timeInterval);
         
         _lastChangeInUtilizationTime = _furnitureManufacturerSimulation.SimulationTime;
     }

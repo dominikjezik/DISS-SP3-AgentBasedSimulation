@@ -15,7 +15,7 @@ public class ArrivalAtWarehouseForMaterial : FurnitureManufacturerBaseEvent
         CurrentWorker.IsMovingToWarehouse = false;
         CurrentWorker.IsInWarehouse = true;
         
-        CurrentWorker.CurrentOrder.State = "Preparation in Warehouse";
+        CurrentWorker.CurrentFurniture.State = "Preparation in Warehouse";
         
         // Naplánovanie dokončenia prípravy materiálu
         var preparationCompletedTime = Simulation.SimulationTime + Simulation.MaterialPreparationTimeGenerator.Next();
