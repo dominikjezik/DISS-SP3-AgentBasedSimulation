@@ -14,6 +14,7 @@ using DiscreteSimulation.GUI.ViewModels;
 using ScottPlot;
 using ScottPlot.AutoScalers;
 using ScottPlot.Plottables;
+using Simulation;
 
 namespace DiscreteSimulation.GUI.Views;
 
@@ -31,6 +32,8 @@ public partial class MainWindow : Window
     private string _selectedCoordinatesTimeUnit;
     private int _skipFirstNReplications = 0;
     private bool _stopSimulationRequested = false;
+
+    private MySimulation _mySimulation;
     
     public MainWindow()
     {
@@ -48,6 +51,25 @@ public partial class MainWindow : Window
         _viewModel.Shared.Simulation.ReplicationEnded += ReplicationEnded;
 
         _viewModel.Shared.Simulation.SimulationEnded += SimulationEnded;
+        
+        // -----
+        _mySimulation = new MySimulation();
+        
+        _mySimulation.OnRefreshUI(simulation =>
+        {
+            var currentQueueLength = _mySimulation.ResourcesAgent.CustomersQueue.Count;
+            Console.WriteLine($"Current queue length: {currentQueueLength}");
+        });
+        
+        _mySimulation.OnReplicationDidFinish(simulation =>
+        {
+            Console.WriteLine($"Replication finished AVG waiting time: {_mySimulation.ResourcesAgent.CustomersQueueWaitingTime.Mean}");
+        });
+        
+        _mySimulation.OnSimulationDidFinish(simulation =>
+        {
+            Console.WriteLine($"Simulation finished AVG waiting time: {_mySimulation.AverageCustomersQueueWaitingTime.Mean}");
+        });
     }
 
     private void SimulationEnded()
@@ -61,6 +83,21 @@ public partial class MainWindow : Window
 
     private async void StartSimulationButton_OnClick(object? sender, RoutedEventArgs e)
     {
+        /*
+        var averageWaitingTime = simulation.AverageCustomersQueueWaitingTime.Mean;
+        var averageQueueLength = simulation.AverageCustomersQueueLength.Mean;
+
+        Console.WriteLine($"*Average Waiting Time: {averageWaitingTime}");
+        Console.WriteLine($"*Average Queue Length: {averageQueueLength}");
+
+        Console.WriteLine("Finished...");
+         */
+        _mySimulation.SetSimSpeed(1, 0.1);
+        Console.WriteLine("Simulating...");
+        await Task.Run(() => _mySimulation.Simulate(1, 10_000));
+        
+        return;
+        
         _viewModel.DisableButtonsForSimulationStart();
 
         _replicationsProcessingOrderTimePlotData.Clear();

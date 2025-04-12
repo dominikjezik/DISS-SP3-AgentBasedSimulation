@@ -35,5 +35,11 @@
         <SubType>Code</SubType>
       </Compile>
     </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="ABACore">
+        <HintPath>..\DiscreteSimulation.Core\lib\ABACore.dll</HintPath>
+      </Reference>
+    </ItemGroup>
     
 </Project>

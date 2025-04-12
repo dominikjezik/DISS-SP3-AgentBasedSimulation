@@ -10,4 +10,10 @@
       <ProjectReference Include="..\DiscreteSimulation.Core\DiscreteSimulation.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Reference Include="ABACore">
+        <HintPath>..\DiscreteSimulation.Core\lib\ABACore.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 </Project>

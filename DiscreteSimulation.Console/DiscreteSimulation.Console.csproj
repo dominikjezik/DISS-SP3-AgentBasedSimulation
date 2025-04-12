@@ -12,4 +12,10 @@
       <ProjectReference Include="..\DiscreteSimulation.FurnitureManufacturer\DiscreteSimulation.FurnitureManufacturer.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <Reference Include="ABACore">
+            <HintPath>..\DiscreteSimulation.Core\lib\ABACore.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+
 </Project>
