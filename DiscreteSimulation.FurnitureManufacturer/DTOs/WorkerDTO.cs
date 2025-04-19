@@ -97,17 +97,17 @@ public class WorkerDTO : INotifyPropertyChanged, IUpdatable<WorkerDTO>
     {
         Id = worker.DisplayId;
         
-        if (worker.IsInWarehouse)
-        {
-            Place = "Warehouse";
-        }
-        else if (worker.IsMovingToWarehouse)
+        if (worker.IsMovingToWarehouse)
         {
             Place = "Moving to warehouse";
         }
         else if (worker.IsMovingToAssemblyLine)
         {
             Place = "Moving to assembly line";
+        }
+        else if (worker.IsInWarehouse)
+        {
+            Place = "Warehouse";
         }
         else if (worker.CurrentAssemblyLine != null)
         {
@@ -126,7 +126,7 @@ public class WorkerDTO : INotifyPropertyChanged, IUpdatable<WorkerDTO>
         else
         {
             Furniture = worker.CurrentFurniture.DisplayId;
-            State = worker.CurrentFurniture.State;
+            State = worker.CurrentFurniture.CurrentOperationStep.ToString();
         }
         
         Utilization = worker.Utilization.ToString("0.00%");

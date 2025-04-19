@@ -94,13 +94,13 @@
             Orientation="Horizontal" 
             Margin="0,0,0,0" 
             HorizontalAlignment="Center">
-            <!-- <Label  -->
-            <!--     VerticalAlignment="Center" -->
-            <!--     FontSize="16" -->
-            <!--     Margin="0,10,5,0" -->
-            <!--     FontFamily="Source Code Pro" -->
-            <!--     FontWeight="Bold" -->
-            <!--     Content="{Binding CurrentSimulationTime}" /> -->
+            <Label
+                VerticalAlignment="Center"
+                FontSize="16"
+                Margin="0,10,5,0"
+                FontFamily="Source Code Pro"
+                FontWeight="Bold"
+                Content="{Binding Shared.CurrentSimulationTime}" />
         </StackPanel>
         
         <StackPanel Grid.Row="0" Grid.Column="2" 
@@ -109,8 +109,7 @@
                     HorizontalAlignment="Left">
             
             <CheckBox 
-                IsChecked="{Binding EnableRender95ConfidenceInterval}"
-                PropertyChanged="Render95ConfidenceIntervalCheckbox_OnPropertyChanged"
+                IsChecked="{Binding Shared.EnableRender95ConfidenceInterval}"
                 IsVisible="{Binding Shared.IsMultipleReplications}"
                 Margin="10,10,20,0">Render 95% Confidence Interval</CheckBox>
             

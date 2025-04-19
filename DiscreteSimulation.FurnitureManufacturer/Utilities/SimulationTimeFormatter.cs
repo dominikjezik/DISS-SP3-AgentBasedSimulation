@@ -28,7 +28,7 @@ public static class SimulationTimeFormatter
         
         if (timeOnly)
         {
-            hours += workingDays * 24;
+            hours += workingDays * 8;
             return $"{hours:00}:{minutes:00}:{seconds:00}";
         }
         

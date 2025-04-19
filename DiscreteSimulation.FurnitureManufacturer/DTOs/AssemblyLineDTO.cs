@@ -6,7 +6,7 @@ namespace DiscreteSimulation.FurnitureManufacturer.DTOs;
 public class AssemblyLineDTO : INotifyPropertyChanged, IUpdatable<AssemblyLineDTO>
 {
     private int _id;
-    private bool _isBusy;
+    private string _statusColor;
     private string _currentOrder;
     private string _currentWorker;
     private string _state;
@@ -21,29 +21,15 @@ public class AssemblyLineDTO : INotifyPropertyChanged, IUpdatable<AssemblyLineDT
             OnPropertyChanged(nameof(Id));
         }
     }
-    
-    public bool IsBusy
-    {
-        get => _isBusy;
-        set
-        {
-            if (value == _isBusy) return;
-            _isBusy = value;
-            OnPropertyChanged(nameof(IsBusy));
-            OnPropertyChanged(nameof(StatusColor));
-        }
-    }
-    
+
     public string StatusColor
     {
-        get
+        get => _statusColor;
+        set
         {
-            if (IsBusy)
-            {
-                return "Red";
-            }
-            
-            return "Green";
+            if (value == _statusColor) return;
+            _statusColor = value;
+            OnPropertyChanged(nameof(StatusColor));
         }
     }
 
@@ -87,15 +73,15 @@ public class AssemblyLineDTO : INotifyPropertyChanged, IUpdatable<AssemblyLineDT
         if (assemblyLine.CurrentFurniture == null)
         {
             CurrentOrder = "Free";
-            IsBusy = false;
+            StatusColor = "Green";
         }
         else
         {
             CurrentOrder = assemblyLine.CurrentFurniture.DisplayId;
-            IsBusy = true;
+            StatusColor = assemblyLine.ContainsFurniture ? "Red" : "Orange";
         }
         
-        State = assemblyLine.CurrentFurniture?.State ?? string.Empty;
+        State = assemblyLine.CurrentFurniture?.CurrentOperationStep.ToString() ?? string.Empty;
         CurrentWorker = assemblyLine.CurrentWorker?.DisplayId ?? string.Empty;
 
         if (assemblyLine.IdleWorkers.Count > 0)
@@ -121,7 +107,7 @@ public class AssemblyLineDTO : INotifyPropertyChanged, IUpdatable<AssemblyLineDT
         CurrentOrder = assemblyLineDTO.CurrentOrder;
         CurrentWorker = assemblyLineDTO.CurrentWorker;
         State = assemblyLineDTO.State;
-        IsBusy = assemblyLineDTO.IsBusy;
+        StatusColor = assemblyLineDTO.StatusColor;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

@@ -2,35 +2,41 @@
 
 namespace DiscreteSimulation.Core.Utilities;
 
-public class EntitiesQueue<TEntity>
+public class EntitiesPriorityQueue<TEntity>
 {
     private Simulation _simulation;
-    
-    private Queue<TEntity> _queue = new();
+
+    private PriorityQueue<TEntity, TEntity> _queue;
     private WeightedStatistics _weightedStatistics = new();
     private double _lastChangeInQueueTime = 0;
     
-    public Queue<TEntity> OriginalQueue => _queue;
+    public PriorityQueue<TEntity, TEntity> OriginalQueue => _queue;
     
     public int Count => _queue.Count;
     
     public double AverageQueueLength => double.IsNaN(_weightedStatistics.Mean) ? 0 : _weightedStatistics.Mean;
     
-    public EntitiesQueue(Simulation simulation)
+    public EntitiesPriorityQueue(IComparer<TEntity> comparator, Simulation simulation)
     {
         _simulation = simulation;
+        _queue = new PriorityQueue<TEntity, TEntity>(comparator);
     }
     
     public void Enqueue(TEntity entity)
     {
         RefreshStatistics();
-        _queue.Enqueue(entity);
+        _queue.Enqueue(entity, entity);
     }
     
     public TEntity Dequeue()
     {
         RefreshStatistics();
         return _queue.Dequeue();
+    }
+    
+    public TEntity Peek()
+    {
+        return _queue.Peek();
     }
     
     public void Clear()

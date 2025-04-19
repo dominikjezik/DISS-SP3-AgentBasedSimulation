@@ -84,7 +84,7 @@ public class FurnitureDTO : INotifyPropertyChanged, IUpdatable<FurnitureDTO>
         Id = furniture.Id.ToString();
         DisplayId = furniture.DisplayId;
         Type = furniture.Type;
-        State = furniture.State;
+        State = furniture.CurrentOperationStep.ToString();
         WaitingTime = (currentSimulationTime - furniture.StartedWaitingTime).FormatToSimulationTime(timeOnly: true);
         Worker = furniture?.CurrentWorker?.DisplayId ?? string.Empty;
     }

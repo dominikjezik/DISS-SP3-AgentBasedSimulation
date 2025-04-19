@@ -73,8 +73,8 @@ public class OrderDTO : INotifyPropertyChanged, IUpdatable<OrderDTO>
     {
         Id = order.Id;
         FurnitureItems = order.FurnitureItems.Select(f => f.ToDTO(currentSimulationTime)).ToList();
-        CountOfFurnitureItems = $"{order.FinishedFurnitureItemsCount}/{order.FurnitureItemsCount}";
-        State = order.State;
+        CountOfFurnitureItems = $"{order.FinishedFurnitureItemsCount}/{order.FurnitureItems.Count}";
+        State = order.State.ToString();
         ArrivalTime = order.ArrivalTime.ToString("F2");
         WaitingTime = (currentSimulationTime - order.StartedWaitingTime).FormatToSimulationTime(timeOnly: true);
     }

@@ -19,4 +19,8 @@ public class Furniture
     public double StartedWaitingTime { get; set; }
     
     public string State { get; set; }
+        
+    public FurnitureOperationStep CurrentOperationStep { get; set; } = FurnitureOperationStep.NotStarted;
+    
+    public double OperationStepEndTime { get; set; }
 }

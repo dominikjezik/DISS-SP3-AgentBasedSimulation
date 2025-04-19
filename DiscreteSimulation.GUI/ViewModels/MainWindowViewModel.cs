@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
-using DiscreteSimulation.FurnitureManufacturer.Simulation;
+using DiscreteSimulation.FurnitureManufacturer;
 using DiscreteSimulation.GUI.ViewModels.Panels;
+using Simulation;
 
 namespace DiscreteSimulation.GUI.ViewModels;
 
@@ -12,7 +13,7 @@ public class MainWindowViewModel : ViewModelBase
     
     public MultipleReplicationsPanelViewModel MultipleReplications { get; set; }
     
-    public FurnitureManufacturerSimulation Simulation => Shared.Simulation;
+    public MySimulation Simulation => Shared.Simulation;
 
     public MainWindowViewModel()
     {
@@ -93,22 +94,6 @@ public class MainWindowViewModel : ViewModelBase
         Shared.PauseResumeSimulationButtonText = "Pause";
     }
     
-    #endregion
-    
-    #region MultipleReplicationsControls
-    
-    private bool _enableRender95ConfidenceInterval = true;
-    
-    public bool EnableRender95ConfidenceInterval
-    {
-        get => _enableRender95ConfidenceInterval;
-        set
-        {
-            _enableRender95ConfidenceInterval = value;
-            OnPropertyChanged();
-        }
-    }
-
     #endregion
     
 }

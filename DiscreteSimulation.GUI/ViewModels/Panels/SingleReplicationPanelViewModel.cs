@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using DiscreteSimulation.FurnitureManufacturer.DTOs;
 
 namespace DiscreteSimulation.GUI.ViewModels.Panels;
@@ -20,13 +21,22 @@ public class SingleReplicationPanelViewModel : ViewModelBase
         {
             OnPropertyChanged(nameof(ReplicationOrderProcessingTime));
             OnPropertyChanged(nameof(ReplicationPendingOrdersWaitingTime));
-            OnPropertyChanged(nameof(ReplicationPendingItemsForStainingWaitingTime));
-            OnPropertyChanged(nameof(ReplicationPendingItemsForFoldingWaitingTime));
-            OnPropertyChanged(nameof(ReplicationPendingItemsForFittingsWaitingTime));
+            OnPropertyChanged(nameof(ReplicationPendingItemsForWorkerAWaitingTime));
+            OnPropertyChanged(nameof(ReplicationPendingItemsForWorkerBWaitingTime));
+            OnPropertyChanged(nameof(ReplicationPendingItemsForWorkerMixWaitingTime));
         }
         else if (e.PropertyName == nameof(Shared.SelectedSpeedIndex))
         {
             OnPropertyChanged(nameof(Delta));
+            
+            if (!double.IsInfinity(Shared.SpeedOptions.ElementAt(Shared.SelectedSpeedIndex).Key))
+            {
+                Shared.Simulation.SetSimSpeed(Delta, SleepTime);
+            }
+            else
+            {
+                Shared.Simulation.SetMaxSimSpeed();
+            }
         }
     }
 
@@ -38,52 +48,60 @@ public class SingleReplicationPanelViewModel : ViewModelBase
         WorkersGroupB = new ObservableCollection<WorkerDTO>();
         WorkersGroupC = new ObservableCollection<WorkerDTO>();
         PendingOrdersQueue = new ObservableCollection<OrderDTO>();
-        PendingForStainingQueue = new ObservableCollection<FurnitureDTO>();
-        PendingForFoldingQueue = new ObservableCollection<FurnitureDTO>();
-        PendingForFittingsQueue = new ObservableCollection<FurnitureDTO>();
+        PendingItemsForWorkerAQueue = new ObservableCollection<FurnitureDTO>();
+        PendingItemsForWorkerBQueue = new ObservableCollection<FurnitureDTO>();
+        PendingItemsForWorkerMixQueue = new ObservableCollection<FurnitureDTO>();
         
-        for (int i = 0; i < Shared.Simulation.CountOfWorkersGroupA; i++)
+        for (int i = 0; i < Shared.CountOfWorkersGroupA; i++)
         {
             WorkersGroupA.Add(new WorkerDTO());
         }
         
-        for (int i = 0; i < Shared.Simulation.CountOfWorkersGroupB; i++)
+        for (int i = 0; i < Shared.CountOfWorkersGroupB; i++)
         {
             WorkersGroupB.Add(new WorkerDTO());
         }
         
-        for (int i = 0; i < Shared.Simulation.CountOfWorkersGroupC; i++)
+        for (int i = 0; i < Shared.CountOfWorkersGroupC; i++)
         {
             WorkersGroupC.Add(new WorkerDTO());
         }
+        
+        for (int i = 0; i < Shared.CountOfAssemblyLines; i++)
+        {
+            AssemblyLines.Add(new AssemblyLineDTO());
+        }
     }
+
+    private double _simulationSpeed = 1.0;
     
-    public int SleepTime
+    private double _sleepTime = 0.1;
+    
+    public double SleepTime
     {
-        get => Shared.Simulation.SleepTime;
+        get => _sleepTime;
         set
         {
-            Shared.Simulation.SleepTime = value;
+            _sleepTime = value;
             OnPropertyChanged();
             OnPropertyChanged(nameof(Delta));
+            
+            if (!double.IsInfinity(SimulationSpeed))
+            {
+                Shared.Simulation.SetSimSpeed(Delta, SleepTime);
+            }
+            else
+            {
+                Shared.Simulation.SetMaxSimSpeed();
+            }
         }
     }
     
-    public double Delta => Shared.Simulation.Delta;
+    public double SimulationSpeed => Shared.SpeedOptions.ElementAt(Shared.SelectedSpeedIndex).Key;
     
-    #region CurrentSimulationTime
+    public double Delta => SimulationSpeed * SleepTime;
     
-    private string _currentSimulationTime = "[Week 1 - Monday] 06:00:00";
-    
-    public string CurrentSimulationTime
-    {
-        get => _currentSimulationTime;
-        set
-        {
-            _currentSimulationTime = value;
-            OnPropertyChanged();
-        }
-    }
+    #region OrderProcessingTime
     
     private string _replicationOrderProcessingTimeSeconds = "-";
     private string _replicationOrderProcessingTimeMinutes = "-";
@@ -133,62 +151,62 @@ public class SingleReplicationPanelViewModel : ViewModelBase
         }
     }
     
-    private string _replicationPendingFurnitureItems = "-";
+    private string _replicationPendingItemsForLine = "-";
     
-    public string ReplicationPendingFurnitureItems
+    public string ReplicationPendingItemsForLine
     {
-        get => _replicationPendingFurnitureItems;
+        get => _replicationPendingItemsForLine;
         set
         {
-            _replicationPendingFurnitureItems = value;
+            _replicationPendingItemsForLine = value;
             OnPropertyChanged();
         }
     }
     
-    private string _replicationPendingItemsForStaining = "-";
+    private string _replicationPendingItemsForWorkerA = "-";
     
-    public string ReplicationPendingItemsForStaining
+    public string ReplicationPendingItemsForWorkerA
     {
-        get => _replicationPendingItemsForStaining;
+        get => _replicationPendingItemsForWorkerA;
         set
         {
-            _replicationPendingItemsForStaining = value;
+            _replicationPendingItemsForWorkerA = value;
             OnPropertyChanged();
         }
     }
     
-    private string _replicationPendingItemsForVarnishing = "-";
+    private string _replicationPendingItemsForWorkerC = "-";
     
-    public string ReplicationPendingItemsForVarnishing
+    public string ReplicationPendingItemsForWorkerC
     {
-        get => _replicationPendingItemsForVarnishing;
+        get => _replicationPendingItemsForWorkerC;
         set
         {
-            _replicationPendingItemsForVarnishing = value;
+            _replicationPendingItemsForWorkerC = value;
             OnPropertyChanged();
         }
     }
     
-    private string _replicationPendingItemsForFolding = "-";
+    private string _replicationPendingItemsForWorkerB = "-";
     
-    public string ReplicationPendingItemsForFolding
+    public string ReplicationPendingItemsForWorkerB
     {
-        get => _replicationPendingItemsForFolding;
+        get => _replicationPendingItemsForWorkerB;
         set
         {
-            _replicationPendingItemsForFolding = value;
+            _replicationPendingItemsForWorkerB = value;
             OnPropertyChanged();
         }
     }
     
-    private string _replicationPendingItemsForFittings = "-";
+    private string _replicationPendingItemsForWorkerMix = "-";
     
-    public string ReplicationPendingItemsForFittings
+    public string ReplicationPendingItemsForWorkerMix
     {
-        get => _replicationPendingItemsForFittings;
+        get => _replicationPendingItemsForWorkerMix;
         set
         {
-            _replicationPendingItemsForFittings = value;
+            _replicationPendingItemsForWorkerMix = value;
             OnPropertyChanged();
         }
     }
@@ -229,164 +247,164 @@ public class SingleReplicationPanelViewModel : ViewModelBase
         OnPropertyChanged(nameof(ReplicationPendingOrdersWaitingTime));
     }
     
-    private string _replicationPendingFurnitureItemsWaitingTimeSeconds = "-";
-    private string _replicationPendingFurnitureItemsWaitingTimeMinutes = "-";
-    private string _replicationPendingFurnitureItemsWaitingTimeHours = "-";
+    private string _replicationPendingItemsForLineWaitingTimeSeconds = "-";
+    private string _replicationPendingItemsForLineWaitingTimeMinutes = "-";
+    private string _replicationPendingItemsForLineWaitingTimeHours = "-";
     
-    public string ReplicationPendingFurnitureItemsWaitingTime
+    public string ReplicationPendingItemsForLineWaitingTime
     {
         get
         {
             return Shared.SelectedTimeUnits switch
             {
-                "seconds" => _replicationPendingFurnitureItemsWaitingTimeSeconds,
-                "minutes" => _replicationPendingFurnitureItemsWaitingTimeMinutes,
-                "hours" => _replicationPendingFurnitureItemsWaitingTimeHours,
+                "seconds" => _replicationPendingItemsForLineWaitingTimeSeconds,
+                "minutes" => _replicationPendingItemsForLineWaitingTimeMinutes,
+                "hours" => _replicationPendingItemsForLineWaitingTimeHours,
                 _ => "-"
             };
         }
     }
     
-    public void SetReplicationPendingFurnitureItemsWaitingTime(double averageTime)
+    public void SetReplicationPendingItemsForLineWaitingTime(double averageTime)
     {
         if (double.IsNaN(averageTime))
         {
             averageTime = 0;
         }
         
-        _replicationPendingFurnitureItemsWaitingTimeSeconds = $"{averageTime:F2}";
-        _replicationPendingFurnitureItemsWaitingTimeMinutes = $"{averageTime / 60:F2}";
-        _replicationPendingFurnitureItemsWaitingTimeHours = $"{averageTime / 3600:F2}";
+        _replicationPendingItemsForLineWaitingTimeSeconds = $"{averageTime:F2}";
+        _replicationPendingItemsForLineWaitingTimeMinutes = $"{averageTime / 60:F2}";
+        _replicationPendingItemsForLineWaitingTimeHours = $"{averageTime / 3600:F2}";
         
-        OnPropertyChanged(nameof(ReplicationPendingFurnitureItemsWaitingTime));
+        OnPropertyChanged(nameof(ReplicationPendingItemsForLineWaitingTime));
     }
     
-    private string _replicationPendingItemsForStainingWaitingTimeSeconds = "-";
-    private string _replicationPendingItemsForStainingWaitingTimeMinutes = "-";
-    private string _replicationPendingItemsForStainingWaitingTimeHours = "-";
+    private string _replicationPendingItemsForWorkerAWaitingTimeSeconds = "-";
+    private string _replicationPendingItemsForWorkerAWaitingTimeMinutes = "-";
+    private string _replicationPendingItemsForWorkerAWaitingTimeHours = "-";
     
-    public string ReplicationPendingItemsForStainingWaitingTime
+    public string ReplicationPendingItemsForWorkerAWaitingTime
     {
         get
         {
             return Shared.SelectedTimeUnits switch
             {
-                "seconds" => _replicationPendingItemsForStainingWaitingTimeSeconds,
-                "minutes" => _replicationPendingItemsForStainingWaitingTimeMinutes,
-                "hours" => _replicationPendingItemsForStainingWaitingTimeHours,
+                "seconds" => _replicationPendingItemsForWorkerAWaitingTimeSeconds,
+                "minutes" => _replicationPendingItemsForWorkerAWaitingTimeMinutes,
+                "hours" => _replicationPendingItemsForWorkerAWaitingTimeHours,
                 _ => "-"
             };
         }
     }
     
-    public void SetReplicationPendingItemsForStainingWaitingTime(double averageTime)
+    public void SetReplicationPendingItemsForWorkerAWaitingTime(double averageTime)
     {
         if (double.IsNaN(averageTime))
         {
             averageTime = 0;
         }
         
-        _replicationPendingItemsForStainingWaitingTimeSeconds = $"{averageTime:F2}";
-        _replicationPendingItemsForStainingWaitingTimeMinutes = $"{averageTime / 60:F2}";
-        _replicationPendingItemsForStainingWaitingTimeHours = $"{averageTime / 3600:F2}";
+        _replicationPendingItemsForWorkerAWaitingTimeSeconds = $"{averageTime:F2}";
+        _replicationPendingItemsForWorkerAWaitingTimeMinutes = $"{averageTime / 60:F2}";
+        _replicationPendingItemsForWorkerAWaitingTimeHours = $"{averageTime / 3600:F2}";
         
-        OnPropertyChanged(nameof(ReplicationPendingItemsForStainingWaitingTime));
+        OnPropertyChanged(nameof(ReplicationPendingItemsForWorkerAWaitingTime));
     }
     
-    private string _replicationPendingItemsForVarnishingWaitingTimeSeconds = "-";
-    private string _replicationPendingItemsForVarnishingWaitingTimeMinutes = "-";
-    private string _replicationPendingItemsForVarnishingWaitingTimeHours = "-";
+    private string _replicationPendingItemsForWorkerCWaitingTimeSeconds = "-";
+    private string _replicationPendingItemsForWorkerCWaitingTimeMinutes = "-";
+    private string _replicationPendingItemsForWorkerCWaitingTimeHours = "-";
     
-    public string ReplicationPendingItemsForVarnishingWaitingTime
+    public string ReplicationPendingItemsForWorkerCWaitingTime
     {
         get
         {
             return Shared.SelectedTimeUnits switch
             {
-                "seconds" => _replicationPendingItemsForVarnishingWaitingTimeSeconds,
-                "minutes" => _replicationPendingItemsForVarnishingWaitingTimeMinutes,
-                "hours" => _replicationPendingItemsForVarnishingWaitingTimeHours,
+                "seconds" => _replicationPendingItemsForWorkerCWaitingTimeSeconds,
+                "minutes" => _replicationPendingItemsForWorkerCWaitingTimeMinutes,
+                "hours" => _replicationPendingItemsForWorkerCWaitingTimeHours,
                 _ => "-"
             };
         }
     }
     
-    public void SetReplicationPendingItemsForVarnishingWaitingTime(double averageTime)
+    public void SetReplicationPendingItemsForWorkerCWaitingTime(double averageTime)
     {
         if (double.IsNaN(averageTime))
         {
             averageTime = 0;
         }
         
-        _replicationPendingItemsForVarnishingWaitingTimeSeconds = $"{averageTime:F2}";
-        _replicationPendingItemsForVarnishingWaitingTimeMinutes = $"{averageTime / 60:F2}";
-        _replicationPendingItemsForVarnishingWaitingTimeHours = $"{averageTime / 3600:F2}";
+        _replicationPendingItemsForWorkerCWaitingTimeSeconds = $"{averageTime:F2}";
+        _replicationPendingItemsForWorkerCWaitingTimeMinutes = $"{averageTime / 60:F2}";
+        _replicationPendingItemsForWorkerCWaitingTimeHours = $"{averageTime / 3600:F2}";
         
-        OnPropertyChanged(nameof(ReplicationPendingItemsForVarnishingWaitingTime));
+        OnPropertyChanged(nameof(ReplicationPendingItemsForWorkerCWaitingTime));
     }
     
-    private string _replicationPendingItemsForFoldingWaitingTimeSeconds = "-";
-    private string _replicationPendingItemsForFoldingWaitingTimeMinutes = "-";
-    private string _replicationPendingItemsForFoldingWaitingTimeHours = "-";
+    private string _replicationPendingItemsForWorkerBWaitingTimeSeconds = "-";
+    private string _replicationPendingItemsForWorkerBWaitingTimeMinutes = "-";
+    private string _replicationPendingItemsForWorkerBWaitingTimeHours = "-";
     
-    public string ReplicationPendingItemsForFoldingWaitingTime
+    public string ReplicationPendingItemsForWorkerBWaitingTime
     {
         get
         {
             return Shared.SelectedTimeUnits switch
             {
-                "seconds" => _replicationPendingItemsForFoldingWaitingTimeSeconds,
-                "minutes" => _replicationPendingItemsForFoldingWaitingTimeMinutes,
-                "hours" => _replicationPendingItemsForFoldingWaitingTimeHours,
+                "seconds" => _replicationPendingItemsForWorkerBWaitingTimeSeconds,
+                "minutes" => _replicationPendingItemsForWorkerBWaitingTimeMinutes,
+                "hours" => _replicationPendingItemsForWorkerBWaitingTimeHours,
                 _ => "-"
             };
         }
     }
     
-    public void SetReplicationPendingItemsForFoldingWaitingTime(double averageTime)
+    public void SetReplicationPendingItemsForWorkerBWaitingTime(double averageTime)
     {
         if (double.IsNaN(averageTime))
         {
             averageTime = 0;
         }
         
-        _replicationPendingItemsForFoldingWaitingTimeSeconds = $"{averageTime:F2}";
-        _replicationPendingItemsForFoldingWaitingTimeMinutes = $"{averageTime / 60:F2}";
-        _replicationPendingItemsForFoldingWaitingTimeHours = $"{averageTime / 3600:F2}";
+        _replicationPendingItemsForWorkerBWaitingTimeSeconds = $"{averageTime:F2}";
+        _replicationPendingItemsForWorkerBWaitingTimeMinutes = $"{averageTime / 60:F2}";
+        _replicationPendingItemsForWorkerBWaitingTimeHours = $"{averageTime / 3600:F2}";
         
-        OnPropertyChanged(nameof(ReplicationPendingItemsForFoldingWaitingTime));
+        OnPropertyChanged(nameof(ReplicationPendingItemsForWorkerBWaitingTime));
     }
     
-    private string _replicationPendingItemsForFittingsWaitingTimeSeconds = "-";
-    private string _replicationPendingItemsForFittingsWaitingTimeMinutes = "-";
-    private string _replicationPendingItemsForFittingsWaitingTimeHours = "-";
+    private string _replicationPendingItemsForWorkerMixWaitingTimeSeconds = "-";
+    private string _replicationPendingItemsForWorkerMixWaitingTimeMinutes = "-";
+    private string _replicationPendingItemsForWorkerMixWaitingTimeHours = "-";
     
-    public string ReplicationPendingItemsForFittingsWaitingTime
+    public string ReplicationPendingItemsForWorkerMixWaitingTime
     {
         get
         {
             return Shared.SelectedTimeUnits switch
             {
-                "seconds" => _replicationPendingItemsForFittingsWaitingTimeSeconds,
-                "minutes" => _replicationPendingItemsForFittingsWaitingTimeMinutes,
-                "hours" => _replicationPendingItemsForFittingsWaitingTimeHours,
+                "seconds" => _replicationPendingItemsForWorkerMixWaitingTimeSeconds,
+                "minutes" => _replicationPendingItemsForWorkerMixWaitingTimeMinutes,
+                "hours" => _replicationPendingItemsForWorkerMixWaitingTimeHours,
                 _ => "-"
             };
         }
     }
     
-    public void SetReplicationPendingItemsForFittingsWaitingTime(double averageTime)
+    public void SetReplicationPendingItemsForWorkerMixWaitingTime(double averageTime)
     {
         if (double.IsNaN(averageTime))
         {
             averageTime = 0;
         }
         
-        _replicationPendingItemsForFittingsWaitingTimeSeconds = $"{averageTime:F2}";
-        _replicationPendingItemsForFittingsWaitingTimeMinutes = $"{averageTime / 60:F2}";
-        _replicationPendingItemsForFittingsWaitingTimeHours = $"{averageTime / 3600:F2}";
+        _replicationPendingItemsForWorkerMixWaitingTimeSeconds = $"{averageTime:F2}";
+        _replicationPendingItemsForWorkerMixWaitingTimeMinutes = $"{averageTime / 60:F2}";
+        _replicationPendingItemsForWorkerMixWaitingTimeHours = $"{averageTime / 3600:F2}";
         
-        OnPropertyChanged(nameof(ReplicationPendingItemsForFittingsWaitingTime));
+        OnPropertyChanged(nameof(ReplicationPendingItemsForWorkerMixWaitingTime));
     }
     
     #endregion
@@ -548,83 +566,83 @@ public class SingleReplicationPanelViewModel : ViewModelBase
     public string PendingOrdersQueueTabTitle => $"Orders ({PendingOrdersQueueCount})";
     
     
-    private string _pendingFurnitureItemsQueueCount = "0";
+    private string _pendingItemsForLineQueueCount = "0";
 
-    public string PendingFurnitureItemsQueueCount
+    public string PendingItemsForLineQueueCount
     {
-        get => _pendingFurnitureItemsQueueCount;
+        get => _pendingItemsForLineQueueCount;
         set
         {
-            _pendingFurnitureItemsQueueCount = value;
+            _pendingItemsForLineQueueCount = value;
             OnPropertyChanged();
-            OnPropertyChanged(nameof(PendingFurnitureItemsQueueTabTitle));
+            OnPropertyChanged(nameof(PendingItemsForLineQueueTabTitle));
         }
     }
     
-    public string PendingFurnitureItemsQueueTabTitle => $"Items ({PendingFurnitureItemsQueueCount})";
+    public string PendingItemsForLineQueueTabTitle => $"for Line ({PendingItemsForLineQueueCount})";
     
     
-    private string _pendingForStainingQueueCount = "0";
+    private string _pendingItemsForWorkerAQueueCount = "0";
     
-    public string PendingForStainingQueueCount
+    public string PendingItemsForWorkerAQueueCount
     {
-        get => _pendingForStainingQueueCount;
+        get => _pendingItemsForWorkerAQueueCount;
         set
         {
-            _pendingForStainingQueueCount = value;
+            _pendingItemsForWorkerAQueueCount = value;
             OnPropertyChanged();
             OnPropertyChanged(nameof(PendingForStainingQueueTabTitle));
         }
     }
-    public string PendingForStainingQueueTabTitle => $"for Staining ({PendingForStainingQueueCount})";
+    public string PendingForStainingQueueTabTitle => $"for Worker A ({PendingItemsForWorkerAQueueCount})";
     
     
-    private string _pendingForVarnishingQueueCount = "0";
+    private string _pendingItemsForWorkerCQueueCount = "0";
     
-    public string PendingForVarnishingQueueCount
+    public string PendingItemsForWorkerCQueueCount
     {
-        get => _pendingForVarnishingQueueCount;
+        get => _pendingItemsForWorkerCQueueCount;
         set
         {
-            _pendingForVarnishingQueueCount = value;
+            _pendingItemsForWorkerCQueueCount = value;
             OnPropertyChanged();
-            OnPropertyChanged(nameof(PendingForVarnishingQueueTabTitle));
+            OnPropertyChanged(nameof(PendingItemsForWorkerCQueueTabTitle));
         }
     }
     
-    public string PendingForVarnishingQueueTabTitle => $"for Varnishing ({PendingForVarnishingQueueCount})";
+    public string PendingItemsForWorkerCQueueTabTitle => $"for Worker C ({PendingItemsForWorkerCQueueCount})";
     
     
-    private string _pendingForFoldingQueueCount = "0";
+    private string _pendingItemsForWorkerBQueueCount = "0";
     
-    public string PendingForFoldingQueueCount
+    public string PendingItemsForWorkerBQueueCount
     {
-        get => _pendingForFoldingQueueCount;
+        get => _pendingItemsForWorkerBQueueCount;
         set
         {
-            _pendingForFoldingQueueCount = value;
+            _pendingItemsForWorkerBQueueCount = value;
             OnPropertyChanged();
-            OnPropertyChanged(nameof(PendingForFoldingQueueTabTitle));
+            OnPropertyChanged(nameof(PendingItemsForWorkerBQueueTabTitle));
         }
     }
     
-    public string PendingForFoldingQueueTabTitle => $"for Folding ({PendingForFoldingQueueCount})";
+    public string PendingItemsForWorkerBQueueTabTitle => $"for Worker B ({PendingItemsForWorkerBQueueCount})";
 
     
-    private string _pendingForFittingsQueueCount = "0";
+    private string _pendingItemsForWorkerMixQueueCount = "0";
     
-    public string PendingForFittingsQueueCount
+    public string PendingItemsForWorkerMixQueueCount
     {
-        get => _pendingForFittingsQueueCount;
+        get => _pendingItemsForWorkerMixQueueCount;
         set
         {
-            _pendingForFittingsQueueCount = value;
+            _pendingItemsForWorkerMixQueueCount = value;
             OnPropertyChanged();
-            OnPropertyChanged(nameof(PendingForFittingsQueueTabTitle));
+            OnPropertyChanged(nameof(PendingItemsForWorkerMixQueueTabTitle));
         }
     }
     
-    public string PendingForFittingsQueueTabTitle => $"for Fittings ({PendingForFittingsQueueCount})";
+    public string PendingItemsForWorkerMixQueueTabTitle => $"for Worker A/C ({PendingItemsForWorkerMixQueueCount})";
     
     private ObservableCollection<OrderDTO> _pendingOrdersQueue = [];
 
@@ -637,57 +655,57 @@ public class SingleReplicationPanelViewModel : ViewModelBase
         }
     }
     
-    private ObservableCollection<FurnitureDTO> _pendingFurnitureItemsQueue = [];
+    private ObservableCollection<FurnitureDTO> _pendingItemsForLineQueue = [];
 
-    public ObservableCollection<FurnitureDTO> PendingFurnitureItemsQueue
+    public ObservableCollection<FurnitureDTO> PendingItemsForLineQueue
     {
-        get => _pendingFurnitureItemsQueue;
+        get => _pendingItemsForLineQueue;
         set {
-            _pendingFurnitureItemsQueue = value;
+            _pendingItemsForLineQueue = value;
             OnPropertyChanged();
         }
     }
     
-    private ObservableCollection<FurnitureDTO> _pendingForStainingQueue = [];
+    private ObservableCollection<FurnitureDTO> _pendingItemsForWorkerAQueue = [];
 
-    public ObservableCollection<FurnitureDTO> PendingForStainingQueue
+    public ObservableCollection<FurnitureDTO> PendingItemsForWorkerAQueue
     {
-        get => _pendingForStainingQueue;
+        get => _pendingItemsForWorkerAQueue;
         set {
-            _pendingForStainingQueue = value;
+            _pendingItemsForWorkerAQueue = value;
             OnPropertyChanged();
         }
     }
     
-    private ObservableCollection<FurnitureDTO> _pendingForVarnishingQueue = [];
+    private ObservableCollection<FurnitureDTO> _pendingItemsForWorkerCQueue = [];
 
-    public ObservableCollection<FurnitureDTO> PendingForVarnishingQueue
+    public ObservableCollection<FurnitureDTO> PendingItemsForWorkerCQueue
     {
-        get => _pendingForVarnishingQueue;
+        get => _pendingItemsForWorkerCQueue;
         set {
-            _pendingForVarnishingQueue = value;
+            _pendingItemsForWorkerCQueue = value;
             OnPropertyChanged();
         }
     }
     
-    private ObservableCollection<FurnitureDTO> _pendingForFoldingQueue = [];
+    private ObservableCollection<FurnitureDTO> _pendingItemsForWorkerBQueue = [];
 
-    public ObservableCollection<FurnitureDTO> PendingForFoldingQueue
+    public ObservableCollection<FurnitureDTO> PendingItemsForWorkerBQueue
     {
-        get => _pendingForFoldingQueue;
+        get => _pendingItemsForWorkerBQueue;
         set {
-            _pendingForFoldingQueue = value;
+            _pendingItemsForWorkerBQueue = value;
             OnPropertyChanged();
         }
     }
     
-    private ObservableCollection<FurnitureDTO> _pendingForFittingsQueue = [];
+    private ObservableCollection<FurnitureDTO> _pendingItemsForWorkerMixQueue = [];
 
-    public ObservableCollection<FurnitureDTO> PendingForFittingsQueue
+    public ObservableCollection<FurnitureDTO> PendingItemsForWorkerMixQueue
     {
-        get => _pendingForFittingsQueue;
+        get => _pendingItemsForWorkerMixQueue;
         set {
-            _pendingForFittingsQueue = value;
+            _pendingItemsForWorkerMixQueue = value;
             OnPropertyChanged();
         }
     }

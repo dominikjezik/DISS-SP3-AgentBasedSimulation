@@ -1,18 +1,29 @@
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using DiscreteSimulation.FurnitureManufacturer.Simulation;
+using DiscreteSimulation.FurnitureManufacturer;
+using Simulation;
 
 namespace DiscreteSimulation.GUI.ViewModels;
 
 public class SharedViewModel : ViewModelBase
 {
-    private readonly FurnitureManufacturerSimulation _simulation = new();
+    private readonly MySimulation _simulation = new();
     
-    public FurnitureManufacturerSimulation Simulation => _simulation;
+    public MySimulation Simulation => _simulation;
     
-    private long _replications = 1;
+    public event Action? SimulationStarted;
     
-    public long Replications
+    public event Action<OSPABA.Simulation>? ReplicationEnded;
+
+
+    public SharedViewModel()
+    {
+        _simulation.OnReplicationDidFinish(simulation => ReplicationEnded?.Invoke(simulation));
+    }
+    
+    private int _replications = 10;
+    
+    public int Replications
     {
         get => _replications;
         set
@@ -28,6 +39,18 @@ public class SharedViewModel : ViewModelBase
     public bool IsSingleReplication => Replications == 1;
     
     public bool IsMultipleReplications => !IsSingleReplication;
+    
+    private string _currentSimulationTime = "[Week 1 - Monday] 06:00:00";
+    
+    public string CurrentSimulationTime
+    {
+        get => _currentSimulationTime;
+        set
+        {
+            _currentSimulationTime = value;
+            OnPropertyChanged();
+        }
+    }
     
     private int _maxReplicationTime = 7_171_200;
     
@@ -50,8 +73,6 @@ public class SharedViewModel : ViewModelBase
         {
             _selectedSpeedIndex = value;
             OnPropertyChanged();
-            
-            Simulation.SimulationSpeed = SpeedOptions.ElementAt(SelectedSpeedIndex).Key;
         }
     }
     
@@ -112,7 +133,7 @@ public class SharedViewModel : ViewModelBase
 
     public void PauseResumeSimulation()
     {
-        if (Simulation.IsSimulationPaused)
+        if (Simulation.IsPaused())
         {
             Simulation.ResumeSimulation();
             PauseResumeSimulationButtonText = "Pause";
@@ -136,11 +157,7 @@ public class SharedViewModel : ViewModelBase
         }
     }
     
-    
-    
-    
-    
-    private int _countOfAssemblyLines = 10;
+    private int _countOfAssemblyLines = 80;
     
     public int CountOfAssemblyLines
     {
@@ -152,7 +169,7 @@ public class SharedViewModel : ViewModelBase
         }
     }
     
-    private int _countOfWorkersGroupA = 2;
+    private int _countOfWorkersGroupA = 5;
     
     public int CountOfWorkersGroupA
     {
@@ -164,7 +181,7 @@ public class SharedViewModel : ViewModelBase
         }
     }
     
-    private int _countOfWorkersGroupB = 2;
+    private int _countOfWorkersGroupB = 5;
     
     public int CountOfWorkersGroupB
     {
@@ -176,7 +193,7 @@ public class SharedViewModel : ViewModelBase
         }
     }
     
-    private int _countOfWorkersGroupC = 18;
+    private int _countOfWorkersGroupC = 60;
     
     public int CountOfWorkersGroupC
     {
@@ -188,7 +205,7 @@ public class SharedViewModel : ViewModelBase
         }
     }
     
-    private bool _enableWorkerLocationPreference = true;
+    private bool _enableWorkerLocationPreference = false;
     
     public bool EnableWorkerLocationPreference
     {
@@ -196,6 +213,18 @@ public class SharedViewModel : ViewModelBase
         set
         {
             _enableWorkerLocationPreference = value;
+            OnPropertyChanged();
+        }
+    }
+    
+    private bool _enableRender95ConfidenceInterval = true;
+    
+    public bool EnableRender95ConfidenceInterval
+    {
+        get => _enableRender95ConfidenceInterval;
+        set
+        {
+            _enableRender95ConfidenceInterval = value;
             OnPropertyChanged();
         }
     }

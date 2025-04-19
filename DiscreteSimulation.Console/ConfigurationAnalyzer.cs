@@ -1,10 +1,10 @@
-﻿using DiscreteSimulation.FurnitureManufacturer.Simulation;
+﻿using Simulation;
 
 namespace DiscreteSimulation.Console;
 
 public class ConfigurationAnalyzer
 {
-    private readonly FurnitureManufacturerSimulation _simulation = new();
+    private readonly MySimulation _simulation = new();
     
     private int _replications;
 
@@ -17,7 +17,7 @@ public class ConfigurationAnalyzer
     public ConfigurationAnalyzer(string basePath)
     {
         _basePath = basePath;
-        _simulation.SimulationEnded += PrintSimulationResults;
+        _simulation.OnSimulationDidFinish(PrintSimulationResults);
     }
     
     public void AnalyzeConfigurations(int replications)
@@ -50,14 +50,17 @@ public class ConfigurationAnalyzer
         _simulation.CountOfWorkersGroupB = workersGroupB;
         _simulation.CountOfWorkersGroupC = workersGroupC;
 
+        /*
         _simulation.MaxReplicationTime = 7_171_200;
         
         _simulation.StartSimulation(_replications);
+        */
     }
     
-    private void PrintSimulationResults()
+    private void PrintSimulationResults(OSPABA.Simulation simulation)
     {
         // Console print
+        /*
         System.Console.WriteLine($"Simulation results for configuration: A={_simulation.CountOfWorkersGroupA}, B={_simulation.CountOfWorkersGroupB}, C={_simulation.CountOfWorkersGroupC}");
 
         var processingOrderTime = _simulation.SimulationAverageProcessingOrderTime.Mean;
@@ -97,5 +100,6 @@ public class ConfigurationAnalyzer
                                          $"{workersAUtilization};{workersAUtilizationCI.Item1};{workersAUtilizationCI.Item2};" +
                                          $"{workersBUtilization};{workersBUtilizationCI.Item1};{workersBUtilizationCI.Item2};" +
                                          $"{workersCUtilization};{workersCUtilizationCI.Item1};{workersCUtilizationCI.Item2};\n");
+       */
     }
 }

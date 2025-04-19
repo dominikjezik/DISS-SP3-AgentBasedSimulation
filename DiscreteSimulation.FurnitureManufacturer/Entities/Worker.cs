@@ -1,12 +1,11 @@
 ﻿using DiscreteSimulation.Core.Utilities;
-using DiscreteSimulation.FurnitureManufacturer.Simulation;
 using DiscreteSimulation.FurnitureManufacturer.Utilities;
 
 namespace DiscreteSimulation.FurnitureManufacturer.Entities;
 
 public class Worker
 {
-    private readonly FurnitureManufacturerSimulation _furnitureManufacturerSimulation;
+    private readonly OSPABA.Simulation _simulation;
     
     private WeightedStatistics _utilizationStatistics = new();
     
@@ -14,9 +13,9 @@ public class Worker
     
     private Furniture? _currentFurniture;
 
-    public Worker(FurnitureManufacturerSimulation furnitureManufacturerSimulation)
+    public Worker(OSPABA.Simulation simulation)
     {
-        _furnitureManufacturerSimulation = furnitureManufacturerSimulation;
+        _simulation = simulation;
     }
     
     public int Id { get; set; }
@@ -69,10 +68,10 @@ public class Worker
     
     public void RefreshStatistics()
     {
-        var timeInterval = _furnitureManufacturerSimulation.SimulationTime - _lastChangeInUtilizationTime;
+        var timeInterval = _simulation.CurrentTime - _lastChangeInUtilizationTime;
         
         _utilizationStatistics.AddValue(CurrentFurniture != null ? 1 : 0, timeInterval);
         
-        _lastChangeInUtilizationTime = _furnitureManufacturerSimulation.SimulationTime;
+        _lastChangeInUtilizationTime = _simulation.CurrentTime;
     }
 }
