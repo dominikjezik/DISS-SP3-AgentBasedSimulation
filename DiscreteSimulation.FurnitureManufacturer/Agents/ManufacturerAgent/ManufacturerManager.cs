@@ -57,21 +57,6 @@ namespace Agents.ManufacturerAgent
 			var assemblyLine = myMessage.AssemblyLine;
 			assemblyLine.CurrentFurniture = myMessage.Furniture;
 			
-			// Kontrola či je to prvá položka objednávky, ktorej bola pridelena linka
-			if (myMessage.Furniture.Order.State == OrderState.Pending)
-			{
-				var orderFromQueue = MyAgent.PendingOrders.Dequeue();
-				
-				if (orderFromQueue != myMessage.Furniture.Order)
-				{
-					throw new Exception($"Unexpected order in queue {orderFromQueue.Id} != {myMessage.Furniture.Order.Id}");
-				}
-
-				myMessage.Furniture.Order.State = OrderState.InProgress;
-				
-				MyAgent.PendingOrdersWaitingTime.AddValue(MySim.CurrentTime - myMessage.Furniture.Order.ArrivalTime);
-			}
-			
 			// Pre zacatie spracovania je potrebne este ziskat volneho pracovnika A
 			myMessage.RequestedWorkerType = [WorkerGroup.GroupA];
 			myMessage.Code = Mc.RequestWorker;
@@ -125,6 +110,21 @@ namespace Agents.ManufacturerAgent
 		{
 			var furniture = myMessage.Furniture;
 			var worker = furniture.CurrentWorker;
+			
+			// Kontrola či je to prvá položka objednávky, ktorej bola pridelena linka
+			if (furniture.Order.State == OrderState.Pending)
+			{
+				var orderFromQueue = MyAgent.PendingOrders.Dequeue();
+				
+				if (orderFromQueue != furniture.Order)
+				{
+					throw new Exception($"Unexpected order in queue {orderFromQueue.Id} != {furniture.Order.Id}");
+				}
+
+				furniture.Order.State = OrderState.InProgress;
+				
+				MyAgent.PendingOrdersWaitingTime.AddValue(MySim.CurrentTime - furniture.Order.ArrivalTime);
+			}
 			
 			if (!worker.IsInWarehouse)
 			{
