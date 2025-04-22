@@ -18,6 +18,8 @@ namespace Simulation
 		public WorkerGroup[] RequestedWorkerType { get; set; }
 
 		public bool NotifyIfWorkerIsAvailable { get; set; } = false;
+		
+		public int MixWorkerRequestedIndex { get; set; } = -1;
 
 		public MyMessage(OSPABA.Simulation mySim) :
 			base(mySim)

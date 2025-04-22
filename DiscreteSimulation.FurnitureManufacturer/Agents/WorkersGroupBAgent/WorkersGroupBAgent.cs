@@ -11,7 +11,7 @@ namespace Agents.WorkersGroupBAgent
 	{
 		public Worker[] Workers { get; private set; }
 		
-		public PriorityQueue<Worker, int> AvailableWorkers { get; private set; } = new();
+		public LinkedList<Worker> AvailableWorkers  { get; private set; } = new();
 
 		public EntitiesPriorityQueue<MyMessage> WorkersRequestsQueue { get; private set; }
 
@@ -57,7 +57,7 @@ namespace Agents.WorkersGroupBAgent
 				};
 				
 				Workers[i] = worker;
-				AvailableWorkers.Enqueue(worker, worker.Id);
+				AvailableWorkers.AddLast(worker);
 			}
 		}
 	}

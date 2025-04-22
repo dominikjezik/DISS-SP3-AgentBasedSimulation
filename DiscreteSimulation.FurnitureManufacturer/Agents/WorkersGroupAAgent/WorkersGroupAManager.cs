@@ -42,8 +42,11 @@ namespace Agents.WorkersGroupAAgent
 				// Je nastavený príznak pre notifikovanie parent agenta, pokial je k dispozícii volny pracovnik
 				myMessage.Addressee = MyAgent.Parent;
 				myMessage.Code = Mc.WorkerIsAvailable;
+				myMessage.NotifyIfWorkerIsAvailable = false;
 				
-				Response(myMessage);
+				MyAgent.AvailableWorkers.AddLast(worker);
+				
+				Notice(myMessage);
 			}
 			else
 			{
@@ -118,7 +121,7 @@ namespace Agents.WorkersGroupAAgent
 			else
 			{
 				myMessage.Worker = null;
-				Request(myMessage);
+				Response(myMessage);
 			}
 		}
 

@@ -8,7 +8,7 @@
              x:DataType="vmp:SingleReplicationPanelViewModel">
     
     <Grid 
-        RowDefinitions="7*,3*" ColumnDefinitions="450,*,400"
+        RowDefinitions="7*,3*" ColumnDefinitions="500,*,400"
         IsVisible="{Binding Shared.IsSingleReplication}">
         
         <TabControl Grid.Row="0" Grid.Column="0" Margin="0,0,0,0">
@@ -118,145 +118,14 @@
                             </DataGridTemplateColumn>
                             <DataGridTextColumn Header="Order" Width="Auto"  Binding="{Binding CurrentOrder}" />
                             <DataGridTextColumn Header="State" Width="*" Binding="{Binding State}" />
-                            <DataGridTextColumn Header="Worker" Width="Auto" Binding="{Binding CurrentWorker}" />
+                            <DataGridTextColumn Header="Worker" Width="*" Binding="{Binding CurrentWorker}" />
+                            <DataGridTextColumn Header="Util" Width="Auto" Binding="{Binding Utilization}" />
                         </DataGrid.Columns>
                     </DataGrid>
         
                 </Grid>
             </TabItem>
         </TabControl>
-        
-        <Grid 
-            IsVisible="False"
-            Grid.Row="0" Grid.Column="1"
-            RowDefinitions="Auto,*">
-            
-            <Label
-                Grid.Row="0" Grid.Column="0"
-                Margin="0,10,0,17"
-                FontSize="16"
-                FontFamily="Source Code Pro"
-                FontWeight="Bold"
-                Content="Animation" />
-            <Border 
-                Grid.Row="1" Grid.Column="0" 
-                BorderBrush="Gray"
-                BorderThickness="1" Margin="0,0,0,0">
-            <ScrollViewer
-                VerticalScrollBarVisibility="Auto">
-                
-                    <!-- <ItemsControl Items="{Binding AnimationWorkers}"> -->
-                    <!--     <ItemsControl.ItemsPanel> -->
-                    <!--         <ItemsPanelTemplate> -->
-                    <!--             <Canvas Width="1000" Height="1000" Background="LightGray"/> -->
-                    <!--         </ItemsPanelTemplate> -->
-                    <!--     </ItemsControl.ItemsPanel> -->
-                    <!-- -->
-                    <!--     <ItemsControl.ItemTemplate> -->
-                    <!--         <DataTemplate> -->
-                    <!--             <Rectangle Width="{Binding Width}" Height="{Binding Height}" Fill="{Binding Fill}"> -->
-                    <!--                 <Canvas.Left> -->
-                    <!--                     <Binding Path="X"/> -->
-                    <!--                 </Canvas.Left> -->
-                    <!--                 <Canvas.Top> -->
-                    <!--                     <Binding Path="Y"/> -->
-                    <!--                 </Canvas.Top> -->
-                    <!--             </Rectangle> -->
-                    <!--         </DataTemplate> -->
-                    <!--     </ItemsControl.ItemTemplate> -->
-                    <!-- </ItemsControl> -->
-                    
-                    <Canvas Height="1000" x:Name="AnimationCanvas">
-                
-                        <Label
-                            Content="Warehouse"
-                            FontSize="12"
-                            FontFamily="Source Code Pro"
-                            FontWeight="Bold"
-                            Foreground="#ad9050"
-                            Canvas.Right="50" Canvas.Top="0"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center" />
-                        <Rectangle Fill="#ad9050" Opacity="0.5" 
-                                   Height="100" Width="100" 
-                                   RadiusX="5" RadiusY="5"
-                                   Canvas.Right="20" Canvas.Top="20" />
-                        
-                        <Label
-                            Content="Assembly line 1"
-                            FontSize="12"
-                            FontFamily="Source Code Pro"
-                            FontWeight="Bold"
-                            Foreground="#3c4bc9"
-                            Canvas.Left="20" Canvas.Top="0"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center" />
-                        <Rectangle Fill="#3c4bc9" Height="60" Width="100" RadiusX="5" RadiusY="5"
-                                   Canvas.Left="20" Canvas.Top="20" Opacity="0.5" />
-                        <Label
-                            Content="Assembly of fittings..."
-                            FontSize="12"
-                            FontFamily="Source Code Pro"
-                            FontWeight="Bold"
-                            Foreground="#3c4bc9"
-                            Canvas.Left="20" Canvas.Top="77"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center" />
-                        
-                        <Rectangle Fill="#3c4bc9" Height="40" Width="40" RadiusX="5" RadiusY="5"
-                                   Canvas.Left="30" Canvas.Top="30"/>
-                        <Label
-                            Canvas.Left="30" Canvas.Top="27"
-                            Content="9999"
-                            FontSize="16"
-                            FontFamily="Source Code Pro"
-                            Foreground="White"
-                            Width="40"
-                            HorizontalContentAlignment="Center" 
-                            VerticalContentAlignment="Center" />
-                        <Label
-                            Canvas.Left="30" Canvas.Top="43"
-                            Content="[5]"
-                            FontSize="16"
-                            FontFamily="Source Code Pro"
-                            Foreground="White"
-                            Width="40"
-                            HorizontalContentAlignment="Center" 
-                            VerticalContentAlignment="Center" />
-                        
-                        <Ellipse 
-                            Fill="Red" Height="30" Width="30"
-                            Canvas.Left="80" Canvas.Top="35"/>
-                        <Label
-                            Canvas.Left="80" Canvas.Top="35"
-                            Content="A2"
-                            FontSize="16"
-                            FontFamily="Source Code Pro"
-                            FontWeight="Bold"
-                            Foreground="White"
-                            Height="30" Width="30"
-                            HorizontalContentAlignment="Center"
-                            VerticalContentAlignment="Center" />
-                        
-                        <Ellipse 
-                            Fill="Green" Height="30" Width="30"
-                            Canvas.Left="130" Canvas.Top="35"/>
-                        <Label
-                            Canvas.Left="130" Canvas.Top="35"
-                            Content="B1"
-                            FontSize="16"
-                            FontFamily="Source Code Pro"
-                            FontWeight="Bold"
-                            Foreground="White"
-                            Height="30" Width="30"
-                            HorizontalContentAlignment="Center"
-                            VerticalContentAlignment="Center" />
-                
-                    </Canvas>
-                </ScrollViewer>
-            </Border>
-            
-        </Grid>
 
         <TabControl Grid.Row="0" Grid.RowSpan="2" Grid.Column="2" Margin="0,0,0,0">
             <TabItem Header="Statistics" FontSize="16" FontWeight="Bold">
@@ -267,14 +136,14 @@
                 
                     <SelectableTextBlock
                         Grid.Row="0" Grid.Column="0"
-                        Margin="5,0,0,10"
+                        Margin="5,0,0,3"
                         FontSize="14"
                         FontFamily="Source Code Pro"
                         Text="Order processing time" />
                     
                     <SelectableTextBlock
                         Grid.Row="0" Grid.Column="1"
-                        Margin="0,0,0,10"
+                        Margin="0,0,0,3"
                         FontSize="14"
                         FontFamily="Source Code Pro"
                         HorizontalAlignment="Center"
@@ -282,7 +151,7 @@
                     
                     <SelectableTextBlock
                         Grid.Row="0" Grid.Column="2"
-                        Margin="0,0,10,10"
+                        Margin="0,0,10,3"
                         FontSize="14"
                         FontFamily="Source Code Pro"
                         Text="{Binding Shared.SelectedTimeUnits}" >
@@ -299,154 +168,22 @@
                     
                     <SelectableTextBlock
                         Grid.Row="1" Grid.Column="0"
-                        Margin="5,0,0,3"
-                        FontSize="14"
-                        FontFamily="Source Code Pro"
-                        Text="Pending orders" />
-                    
-                    <SelectableTextBlock
-                        Grid.Row="1" Grid.Column="1"
-                        Margin="0,0,0,3"
-                        FontSize="14"
-                        FontFamily="Source Code Pro"
-                        HorizontalAlignment="Center"
-                        Text="{Binding ReplicationPendingOrders}" />
-                    
-                    <SelectableTextBlock
-                        Grid.Row="1" Grid.Column="2"
-                        Margin="0,0,10,3"
-                        FontSize="14"
-                        FontFamily="Source Code Pro"
-                        Text="orders" />
-                    
-                    <SelectableTextBlock
-                        Grid.Row="2" Grid.Column="0"
-                        Margin="5,0,0,3"
-                        FontSize="14"
-                        FontFamily="Source Code Pro"
-                        Text="Pending items for line" />
-                    
-                    <SelectableTextBlock
-                        Grid.Row="2" Grid.Column="1"
-                        Margin="0,0,0,3"
-                        FontSize="14"
-                        FontFamily="Source Code Pro"
-                        HorizontalAlignment="Center"
-                        Text="{Binding ReplicationPendingItemsForLine}" />
-                    
-                    <SelectableTextBlock
-                        Grid.Row="2" Grid.Column="2"
-                        Margin="0,0,10,3"
-                        FontSize="14"
-                        FontFamily="Source Code Pro"
-                        Text="items" />
-                    
-                    <SelectableTextBlock
-                        Grid.Row="3" Grid.Column="0"
-                        Margin="5,0,0,3"
-                        FontSize="14"
-                        FontFamily="Source Code Pro"
-                        Text="Pending items for worker A" />
-            
-                    <SelectableTextBlock
-                        Grid.Row="3" Grid.Column="1"
-                        Margin="0,0,0,3"
-                        FontSize="14"
-                        FontFamily="Source Code Pro"
-                        HorizontalAlignment="Center"
-                        Text="{Binding ReplicationPendingItemsForWorkerA}" />
-                    
-                    <SelectableTextBlock
-                        Grid.Row="3" Grid.Column="2"
-                        Margin="0,0,10,3"
-                        FontSize="14"
-                        FontFamily="Source Code Pro"
-                        Text="items" />
-                    
-                    <SelectableTextBlock
-                        Grid.Row="4" Grid.Column="0"
-                        Margin="5,0,0,3"
-                        FontSize="14"
-                        FontFamily="Source Code Pro"
-                        Text="Pending items for worker C" />
-            
-                    <SelectableTextBlock
-                        Grid.Row="4" Grid.Column="1"
-                        Margin="0,0,0,3"
-                        FontSize="14"
-                        FontFamily="Source Code Pro"
-                        HorizontalAlignment="Center"
-                        Text="{Binding ReplicationPendingItemsForWorkerC}" />
-                    
-                    <SelectableTextBlock
-                        Grid.Row="4" Grid.Column="2"
-                        Margin="0,0,10,3"
-                        FontSize="14"
-                        FontFamily="Source Code Pro"
-                        Text="items" />
-                        
-                    <SelectableTextBlock
-                        Grid.Row="5" Grid.Column="0"
-                        Margin="5,0,0,3"
-                        FontSize="14"
-                        FontFamily="Source Code Pro"
-                        Text="Pending items for worker B" />
-            
-                    <SelectableTextBlock
-                        Grid.Row="5" Grid.Column="1"
-                        Margin="0,0,0,3"
-                        FontSize="14"
-                        FontFamily="Source Code Pro"
-                        HorizontalAlignment="Center"
-                        Text="{Binding ReplicationPendingItemsForWorkerB}" />
-                    
-                    <SelectableTextBlock
-                        Grid.Row="5" Grid.Column="2"
-                        Margin="0,0,10,3"
-                        FontSize="14"
-                        FontFamily="Source Code Pro"
-                        Text="items" />
-                        
-                    <SelectableTextBlock
-                        Grid.Row="6" Grid.Column="0"
                         Margin="5,0,0,10"
                         FontSize="14"
                         FontFamily="Source Code Pro"
-                        Text="Pending closets for worker A/C" />
-            
+                        Text="Order item processing time" />
+                    
                     <SelectableTextBlock
-                        Grid.Row="6" Grid.Column="1"
+                        Grid.Row="1" Grid.Column="1"
                         Margin="0,0,0,10"
                         FontSize="14"
                         FontFamily="Source Code Pro"
                         HorizontalAlignment="Center"
-                        Text="{Binding ReplicationPendingItemsForWorkerMix}" />
+                        Text="{Binding ReplicationOrderItemProcessingTime}" />
                     
                     <SelectableTextBlock
-                        Grid.Row="6" Grid.Column="2"
+                        Grid.Row="1" Grid.Column="2"
                         Margin="0,0,10,10"
-                        FontSize="14"
-                        FontFamily="Source Code Pro"
-                        Text="items" />
-
-                    <SelectableTextBlock
-                        Grid.Row="7" Grid.Column="0"
-                        Margin="5,0,0,3"
-                        FontSize="14"
-                        FontFamily="Source Code Pro"
-                        Text="Waiting time pending orders" />
-            
-                    <SelectableTextBlock
-                        Grid.Row="7" Grid.Column="1"
-                        Margin="0,0,0,3"
-                        FontSize="14"
-                        FontFamily="Source Code Pro"
-                        HorizontalAlignment="Center"
-                        Text="{Binding ReplicationPendingOrdersWaitingTime}" />
-                    
-                    <SelectableTextBlock
-                        Grid.Row="7" Grid.Column="2"
-                        Margin="0,0,10,3"
                         FontSize="14"
                         FontFamily="Source Code Pro"
                         Text="{Binding Shared.SelectedTimeUnits}" >
@@ -462,11 +199,143 @@
                     </SelectableTextBlock>
                     
                     <SelectableTextBlock
+                        Grid.Row="2" Grid.Column="0"
+                        Margin="5,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="Pending orders" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="2" Grid.Column="1"
+                        Margin="0,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        HorizontalAlignment="Center"
+                        Text="{Binding ReplicationPendingOrders}" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="2" Grid.Column="2"
+                        Margin="0,0,10,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="orders" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="3" Grid.Column="0"
+                        Margin="5,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="Pending items for line" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="3" Grid.Column="1"
+                        Margin="0,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        HorizontalAlignment="Center"
+                        Text="{Binding ReplicationPendingItemsForLine}" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="3" Grid.Column="2"
+                        Margin="0,0,10,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="items" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="4" Grid.Column="0"
+                        Margin="5,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="Pending items for worker A" />
+            
+                    <SelectableTextBlock
+                        Grid.Row="4" Grid.Column="1"
+                        Margin="0,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        HorizontalAlignment="Center"
+                        Text="{Binding ReplicationPendingItemsForWorkerA}" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="4" Grid.Column="2"
+                        Margin="0,0,10,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="items" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="5" Grid.Column="0"
+                        Margin="5,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="Pending items for worker C" />
+            
+                    <SelectableTextBlock
+                        Grid.Row="5" Grid.Column="1"
+                        Margin="0,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        HorizontalAlignment="Center"
+                        Text="{Binding ReplicationPendingItemsForWorkerC}" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="5" Grid.Column="2"
+                        Margin="0,0,10,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="items" />
+                        
+                    <SelectableTextBlock
+                        Grid.Row="6" Grid.Column="0"
+                        Margin="5,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="Pending items for worker B" />
+            
+                    <SelectableTextBlock
+                        Grid.Row="6" Grid.Column="1"
+                        Margin="0,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        HorizontalAlignment="Center"
+                        Text="{Binding ReplicationPendingItemsForWorkerB}" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="6" Grid.Column="2"
+                        Margin="0,0,10,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="items" />
+                        
+                    <SelectableTextBlock
+                        Grid.Row="7" Grid.Column="0"
+                        Margin="5,0,0,10"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="Pending closets for worker A/C" />
+            
+                    <SelectableTextBlock
+                        Grid.Row="7" Grid.Column="1"
+                        Margin="0,0,0,10"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        HorizontalAlignment="Center"
+                        Text="{Binding ReplicationPendingItemsForWorkerMix}" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="7" Grid.Column="2"
+                        Margin="0,0,10,10"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="items" />
+
+                    <SelectableTextBlock
                         Grid.Row="8" Grid.Column="0"
                         Margin="5,0,0,3"
                         FontSize="14"
                         FontFamily="Source Code Pro"
-                        Text="Waiting time pending for line" />
+                        Text="Waiting time pending orders" />
             
                     <SelectableTextBlock
                         Grid.Row="8" Grid.Column="1"
@@ -474,7 +343,7 @@
                         FontSize="14"
                         FontFamily="Source Code Pro"
                         HorizontalAlignment="Center"
-                        Text="{Binding ReplicationPendingItemsForLineWaitingTime}" />
+                        Text="{Binding ReplicationPendingOrdersWaitingTime}" />
                     
                     <SelectableTextBlock
                         Grid.Row="8" Grid.Column="2"
@@ -492,13 +361,13 @@
                         </SelectableTextBlock.ContextMenu>
                         
                     </SelectableTextBlock>
-
+                    
                     <SelectableTextBlock
                         Grid.Row="9" Grid.Column="0"
                         Margin="5,0,0,3"
                         FontSize="14"
                         FontFamily="Source Code Pro"
-                        Text="Waiting time pending for worker A" />
+                        Text="Waiting time pending for line" />
             
                     <SelectableTextBlock
                         Grid.Row="9" Grid.Column="1"
@@ -506,7 +375,7 @@
                         FontSize="14"
                         FontFamily="Source Code Pro"
                         HorizontalAlignment="Center"
-                        Text="{Binding ReplicationPendingItemsForWorkerAWaitingTime}" />
+                        Text="{Binding ReplicationPendingItemsForLineWaitingTime}" />
                     
                     <SelectableTextBlock
                         Grid.Row="9" Grid.Column="2"
@@ -524,13 +393,13 @@
                         </SelectableTextBlock.ContextMenu>
                         
                     </SelectableTextBlock>
-                    
+
                     <SelectableTextBlock
                         Grid.Row="10" Grid.Column="0"
                         Margin="5,0,0,3"
                         FontSize="14"
                         FontFamily="Source Code Pro"
-                        Text="Waiting time pending for worker C" />
+                        Text="Waiting time pending for worker A" />
             
                     <SelectableTextBlock
                         Grid.Row="10" Grid.Column="1"
@@ -538,8 +407,8 @@
                         FontSize="14"
                         FontFamily="Source Code Pro"
                         HorizontalAlignment="Center"
-                        Text="{Binding ReplicationPendingItemsForWorkerCWaitingTime}" />
-
+                        Text="{Binding ReplicationPendingItemsForWorkerAWaitingTime}" />
+                    
                     <SelectableTextBlock
                         Grid.Row="10" Grid.Column="2"
                         Margin="0,0,10,3"
@@ -556,13 +425,13 @@
                         </SelectableTextBlock.ContextMenu>
                         
                     </SelectableTextBlock>
-                        
+                    
                     <SelectableTextBlock
                         Grid.Row="11" Grid.Column="0"
                         Margin="5,0,0,3"
                         FontSize="14"
                         FontFamily="Source Code Pro"
-                        Text="Waiting time pending for worker B" />
+                        Text="Waiting time pending for worker C" />
             
                     <SelectableTextBlock
                         Grid.Row="11" Grid.Column="1"
@@ -570,7 +439,7 @@
                         FontSize="14"
                         FontFamily="Source Code Pro"
                         HorizontalAlignment="Center"
-                        Text="{Binding ReplicationPendingItemsForWorkerBWaitingTime}" />
+                        Text="{Binding ReplicationPendingItemsForWorkerCWaitingTime}" />
 
                     <SelectableTextBlock
                         Grid.Row="11" Grid.Column="2"
@@ -591,13 +460,45 @@
                         
                     <SelectableTextBlock
                         Grid.Row="12" Grid.Column="0"
+                        Margin="5,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="Waiting time pending for worker B" />
+            
+                    <SelectableTextBlock
+                        Grid.Row="12" Grid.Column="1"
+                        Margin="0,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        HorizontalAlignment="Center"
+                        Text="{Binding ReplicationPendingItemsForWorkerBWaitingTime}" />
+
+                    <SelectableTextBlock
+                        Grid.Row="12" Grid.Column="2"
+                        Margin="0,0,10,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="{Binding Shared.SelectedTimeUnits}" >
+                        
+                        <SelectableTextBlock.ContextMenu>
+                            <ContextMenu >
+                                <MenuItem Header="seconds" Click="TimeUnitsMenuItem_OnClick" />
+                                <MenuItem Header="minutes" Click="TimeUnitsMenuItem_OnClick" />
+                                <MenuItem Header="hours" Click="TimeUnitsMenuItem_OnClick" />
+                            </ContextMenu>
+                        </SelectableTextBlock.ContextMenu>
+                        
+                    </SelectableTextBlock>
+                        
+                    <SelectableTextBlock
+                        Grid.Row="13" Grid.Column="0"
                         Margin="5,0,0,10"
                         FontSize="14"
                         FontFamily="Source Code Pro"
                         Text="Waiting time pending for worker A/C" />
             
                     <SelectableTextBlock
-                        Grid.Row="12" Grid.Column="1"
+                        Grid.Row="13" Grid.Column="1"
                         Margin="0,0,0,10"
                         FontSize="14"
                         FontFamily="Source Code Pro"
@@ -605,7 +506,7 @@
                         Text="{Binding ReplicationPendingItemsForWorkerMixWaitingTime}" />
 
                     <SelectableTextBlock
-                        Grid.Row="12" Grid.Column="2"
+                        Grid.Row="13" Grid.Column="2"
                         Margin="0,0,10,10"
                         FontSize="14"
                         FontFamily="Source Code Pro"
@@ -622,45 +523,23 @@
                     </SelectableTextBlock>
                     
                     <SelectableTextBlock
-                        Grid.Row="13" Grid.Column="0"
-                        Margin="5,0,0,3"
-                        FontSize="14"
-                        FontFamily="Source Code Pro"
-                        Text="Workers group A utilization" />
-                    
-                    <SelectableTextBlock
-                        Grid.Row="13" Grid.Column="1"
-                        Margin="0,0,0,3"
-                        FontSize="14"
-                        FontFamily="Source Code Pro"
-                        HorizontalAlignment="Center"
-                        Text="{Binding ReplicationWorkersGroupAUtilization}" />
-                    
-                    <SelectableTextBlock
-                        Grid.Row="13" Grid.Column="2"
-                        Margin="0,0,10,3"
-                        FontSize="14"
-                        FontFamily="Source Code Pro"
-                        Text="%" />
-                    
-                    <SelectableTextBlock
                         Grid.Row="14" Grid.Column="0"
-                        Margin="5,0,0,3"
+                        Margin="5,0,0,10"
                         FontSize="14"
                         FontFamily="Source Code Pro"
-                        Text="Workers group B utilization" />
+                        Text="Assembly lines utilization" />
                     
                     <SelectableTextBlock
                         Grid.Row="14" Grid.Column="1"
-                        Margin="0,0,0,3"
+                        Margin="0,0,0,10"
                         FontSize="14"
                         FontFamily="Source Code Pro"
                         HorizontalAlignment="Center"
-                        Text="{Binding ReplicationWorkersGroupBUtilization}" />
+                        Text="{Binding ReplicationAssemblyLinesUtilization}" />
                     
                     <SelectableTextBlock
                         Grid.Row="14" Grid.Column="2"
-                        Margin="0,0,10,3"
+                        Margin="0,0,10,10"
                         FontSize="14"
                         FontFamily="Source Code Pro"
                         Text="%" />
@@ -670,7 +549,7 @@
                         Margin="5,0,0,3"
                         FontSize="14"
                         FontFamily="Source Code Pro"
-                        Text="Workers group C utilization" />
+                        Text="Workers group A utilization" />
                     
                     <SelectableTextBlock
                         Grid.Row="15" Grid.Column="1"
@@ -678,10 +557,54 @@
                         FontSize="14"
                         FontFamily="Source Code Pro"
                         HorizontalAlignment="Center"
-                        Text="{Binding ReplicationWorkersGroupCUtilization}" />
+                        Text="{Binding ReplicationWorkersGroupAUtilization}" />
                     
                     <SelectableTextBlock
                         Grid.Row="15" Grid.Column="2"
+                        Margin="0,0,10,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="%" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="16" Grid.Column="0"
+                        Margin="5,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="Workers group B utilization" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="16" Grid.Column="1"
+                        Margin="0,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        HorizontalAlignment="Center"
+                        Text="{Binding ReplicationWorkersGroupBUtilization}" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="16" Grid.Column="2"
+                        Margin="0,0,10,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="%" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="17" Grid.Column="0"
+                        Margin="5,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        Text="Workers group C utilization" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="17" Grid.Column="1"
+                        Margin="0,0,0,3"
+                        FontSize="14"
+                        FontFamily="Source Code Pro"
+                        HorizontalAlignment="Center"
+                        Text="{Binding ReplicationWorkersGroupCUtilization}" />
+                    
+                    <SelectableTextBlock
+                        Grid.Row="17" Grid.Column="2"
                         Margin="0,0,10,3"
                         FontSize="14"
                         FontFamily="Source Code Pro"

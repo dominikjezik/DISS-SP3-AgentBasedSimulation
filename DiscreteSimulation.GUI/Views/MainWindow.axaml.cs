@@ -137,6 +137,7 @@ public partial class MainWindow : Window
         var pendingItemsForWorkerMixQueueCount = _viewModel.Simulation.WorkersAgent.MixedWorkersRequestsQueue.Count;
         
         var averageProcessingOrderTime = _viewModel.Simulation.EnvironmentAgent.ProcessingOrderTime.Mean;
+        var averageProcessingOrderItemTime = _viewModel.Simulation.ManufacturerAgent.ProcessingFurnitureTime.Mean;
         
         _viewModel.Simulation.ManufacturerAgent.PendingOrders.RefreshStatistics();
         _viewModel.Simulation.AssemblyLinesAgent.RequestsQueue.RefreshStatistics();
@@ -164,6 +165,14 @@ public partial class MainWindow : Window
         var workersGroupB = _viewModel.Simulation.WorkersGroupBAgent.Workers.Select(w => w.ToDTO()).ToList();
         var workersGroupC = _viewModel.Simulation.WorkersGroupCAgent.Workers.Select(w => w.ToDTO()).ToList();
         
+        // Refresh štatistík vyťaženia výrobných liniek
+        foreach (AssemblyLine assemblyLine in _viewModel.Simulation.AssemblyLinesAgent.AssemblyLines)
+        {
+            assemblyLine.RefreshStatistics();
+        }
+        
+        var assemblyLinesUtilization = _viewModel.Simulation.AssemblyLinesAgent.AssemblyLines.Average(assemblyLine => assemblyLine.Utilization) * 100;
+        
         // Refresh štatistík vyťaženia pracovníkov
         foreach (Worker worker in _viewModel.Simulation.WorkersGroupAAgent.Workers)
         {
@@ -190,6 +199,7 @@ public partial class MainWindow : Window
         {
             _viewModel.Shared.CurrentSimulationTime = simulationTime.FormatToSimulationTime();
             _viewModel.SingleReplication.SetReplicationOrderProcessingTime(averageProcessingOrderTime);
+            _viewModel.SingleReplication.SetReplicationOrderItemProcessingTime(averageProcessingOrderItemTime);
             
             _viewModel.SingleReplication.ReplicationPendingOrders = $"{averagePendingOrders:F2}";
             _viewModel.SingleReplication.ReplicationPendingItemsForLine = $"{averagePendingItemsForLine:F2}";
@@ -227,6 +237,8 @@ public partial class MainWindow : Window
                 SynchronizeCollection(_viewModel.SingleReplication.SelectedOrderFurnitureItems, selectedOrder.FurnitureItems);
             }
             
+            _viewModel.SingleReplication.ReplicationAssemblyLinesUtilization = $"{assemblyLinesUtilization:F2}";
+            
             _viewModel.SingleReplication.ReplicationWorkersGroupAUtilization = $"{workersGroupAUtilization:F2}";
             _viewModel.SingleReplication.ReplicationWorkersGroupBUtilization = $"{workersGroupBUtilization:F2}";
             _viewModel.SingleReplication.ReplicationWorkersGroupCUtilization = $"{workersGroupCUtilization:F2}";
@@ -246,6 +258,8 @@ public partial class MainWindow : Window
         
         var averageProcessingOrderTime = _viewModel.Simulation.AverageProcessingOrderTime.Mean;
         var averageProcessingOrderTimeCI = _viewModel.Simulation.AverageProcessingOrderTime.ConfidenceInterval95();
+        var averageProcessingOrderItemTime = _viewModel.Simulation.AverageProcessingFurnitureTime.Mean;
+        var averageProcessingOrderItemTimeCI = _viewModel.Simulation.AverageProcessingFurnitureTime.ConfidenceInterval95();
         
         var averagePendingOrdersCount = _viewModel.Simulation.AveragePendingOrdersCount.Mean;
         var averagePendingOrdersCountCI = _viewModel.Simulation.AveragePendingOrdersCount.ConfidenceInterval95();
@@ -273,12 +287,27 @@ public partial class MainWindow : Window
         var averagePendingItemsForWorkerMixWaitingTime = _viewModel.Simulation.AveragePendingItemsForWorkerMixWaitingTime.Mean;
         var averagePendingItemsForWorkerMixWaitingTimeCI = _viewModel.Simulation.AveragePendingItemsForWorkerMixWaitingTime.ConfidenceInterval95();
         
+        var averageAssemblyLinesUtilization = _viewModel.Simulation.AverageAssemblyLinesUtilization.Mean;
+        var averageAssemblyLinesUtilizationCI = _viewModel.Simulation.AverageAssemblyLinesUtilization.ConfidenceInterval95();
+        
         var averageWorkersGroupAUtilization = _viewModel.Simulation.AverageWorkersGroupAUtilization.Mean;
         var averageWorkersGroupAUtilizationCI = _viewModel.Simulation.AverageWorkersGroupAUtilization.ConfidenceInterval95();
         var averageWorkersGroupBUtilization = _viewModel.Simulation.AverageWorkersGroupBUtilization.Mean;
         var averageWorkersGroupBUtilizationCI = _viewModel.Simulation.AverageWorkersGroupBUtilization.ConfidenceInterval95();
         var averageWorkersGroupCUtilization = _viewModel.Simulation.AverageWorkersGroupCUtilization.Mean;
         var averageWorkersGroupCUtilizationCI = _viewModel.Simulation.AverageWorkersGroupCUtilization.ConfidenceInterval95();
+        
+        var allAssemblyLinesUtilization = new List<AssemblyLineDTO>();
+        
+        for (int i = 0; i < _viewModel.Simulation.AverageAllAssemblyLinesUtilization.Length; i++)
+        {
+            var utilization = _viewModel.Simulation.AverageAllAssemblyLinesUtilization[i].ConfidenceInterval95();
+            var mean = _viewModel.Simulation.AverageAllAssemblyLinesUtilization[i].Mean;
+            
+            var assemblyLine = _viewModel.Simulation.AssemblyLinesAgent.AssemblyLines[i].ToUtilizationDTO(mean, utilization);
+            
+            allAssemblyLinesUtilization.Add(assemblyLine);
+        }
         
         var allWorkersUtilization = new List<WorkerDTO>();
         
@@ -313,6 +342,7 @@ public partial class MainWindow : Window
         {
             _viewModel.MultipleReplications.CurrentReplication = $"{currentReplication}";
             _viewModel.MultipleReplications.SetSimulationCurrentProcessingOrderTime(averageProcessingOrderTime, averageProcessingOrderTimeCI.Item1, averageProcessingOrderTimeCI.Item2);
+            _viewModel.MultipleReplications.SetSimulationCurrentProcessingOrderItemTime(averageProcessingOrderItemTime, averageProcessingOrderItemTimeCI.Item1, averageProcessingOrderItemTimeCI.Item2);
             
             _viewModel.MultipleReplications.SimulationPendingOrders = $"{averagePendingOrdersCount:F2}";
             _viewModel.MultipleReplications.SimulationPendingOrdersCI = $"<{averagePendingOrdersCountCI.Item1:F2} ; {averagePendingOrdersCountCI.Item2:F2}>";
@@ -358,12 +388,22 @@ public partial class MainWindow : Window
                 averagePendingItemsForWorkerMixWaitingTimeCI.Item2
             );
             
+            _viewModel.MultipleReplications.SimulationAssemblyLinesUtilization = $"{averageAssemblyLinesUtilization * 100:F2}";
+            _viewModel.MultipleReplications.SimulationAssemblyLinesUtilizationCI = $"<{(averageAssemblyLinesUtilizationCI.Item1*100):F2} ; {(averageAssemblyLinesUtilizationCI.Item2*100):F2}>";
+            
             _viewModel.MultipleReplications.SimulationWorkersAUtilization = $"{averageWorkersGroupAUtilization * 100:F2}";
             _viewModel.MultipleReplications.SimulationWorkersAUtilizationCI = $"<{(averageWorkersGroupAUtilizationCI.Item1*100):F2} ; {(averageWorkersGroupAUtilizationCI.Item2*100):F2}>";
             _viewModel.MultipleReplications.SimulationWorkersBUtilization = $"{averageWorkersGroupBUtilization * 100:F2}";
             _viewModel.MultipleReplications.SimulationWorkersBUtilizationCI = $"<{(averageWorkersGroupBUtilizationCI.Item1*100):F2} ; {(averageWorkersGroupBUtilizationCI.Item2*100):F2}>";
             _viewModel.MultipleReplications.SimulationWorkersCUtilization = $"{averageWorkersGroupCUtilization * 100:F2}";
             _viewModel.MultipleReplications.SimulationWorkersCUtilizationCI = $"<{(averageWorkersGroupCUtilizationCI.Item1*100):F2} ; {(averageWorkersGroupCUtilizationCI.Item2*100):F2}>";
+            
+            for (int i = 0; i < allAssemblyLinesUtilization.Count; i++)
+            {
+                _viewModel.MultipleReplications.SimulationAllAssemblyLinesUtilization[i].Id = allAssemblyLinesUtilization[i].Id;
+                _viewModel.MultipleReplications.SimulationAllAssemblyLinesUtilization[i].State = allAssemblyLinesUtilization[i].State;
+                _viewModel.MultipleReplications.SimulationAllAssemblyLinesUtilization[i].Utilization = allAssemblyLinesUtilization[i].Utilization;
+            }
             
             for (int i = 0; i < allWorkersUtilization.Count; i++)
             {

@@ -15,6 +15,8 @@ namespace Agents.EnvironmentAgent.ContinualAssistants
 		
 		private ContinuousUniformGenerator _furnitureTypeGenerator;
 		
+		private ContinuousUniformGenerator _needsToBeVarnishedGenerator;
+		
 		private DiscreteUniformGenerator _countOfOrderItemsGenerator;
 		
 		public OrdersArrivalScheduler(int id, OSPABA.Simulation mySim, CommonAgent myAgent) :
@@ -24,6 +26,7 @@ namespace Agents.EnvironmentAgent.ContinualAssistants
 			
 			_newOrderArrivalGenerator = new ExponentialDistributionGenerator(1.0 / (60 * 30), mySimulation.SeedGenerator.Next());
 			_furnitureTypeGenerator = new ContinuousUniformGenerator(0, 1, mySimulation.SeedGenerator.Next());
+			_needsToBeVarnishedGenerator = new ContinuousUniformGenerator(0, 1, mySimulation.SeedGenerator.Next());
 			_countOfOrderItemsGenerator = new DiscreteUniformGenerator(1, 6, mySimulation.SeedGenerator.Next());
 		}
 
@@ -105,7 +108,6 @@ namespace Agents.EnvironmentAgent.ContinualAssistants
 				var item = GenerateFurniture();
 				item.Id = i + 1;
 				item.Order = order;
-				
 				furnitureItems.Add(item);
 			}
 			
@@ -132,10 +134,13 @@ namespace Agents.EnvironmentAgent.ContinualAssistants
 			{
 				furnitureType = FurnitureType.Closet;
 			}
+			
+			var needsToBeVarnishedProbability = _needsToBeVarnishedGenerator.Next();
 
 			var furniture = new Furniture
 			{
 				Type = furnitureType,
+				NeedsToBeVarnished = needsToBeVarnishedProbability < 0.15,
 				StartedWaitingTime = MySim.CurrentTime,
 				CurrentOperationStep = FurnitureOperationStep.NotStarted,
 				State = "Pending"

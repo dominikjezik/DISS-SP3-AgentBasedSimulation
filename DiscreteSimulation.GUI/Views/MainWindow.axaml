@@ -113,12 +113,6 @@
                 IsVisible="{Binding Shared.IsMultipleReplications}"
                 Margin="10,10,20,0">Render 95% Confidence Interval</CheckBox>
             
-            <CheckBox 
-                IsChecked="{Binding Shared.EnableWorkerLocationPreference}"
-                IsEnabled="{Binding Shared.IsStartSimulationButtonEnabled}"
-                IsVisible="{Binding Shared.IsMultipleReplications}"
-                Margin="0,10,25,0">Worker location preference</CheckBox>
-            
             <Label 
                 VerticalAlignment="Center"
                 Margin="0,10,10,0" >Max replication time</Label>

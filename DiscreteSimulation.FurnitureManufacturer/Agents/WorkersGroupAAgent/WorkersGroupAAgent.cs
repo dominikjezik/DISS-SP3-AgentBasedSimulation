@@ -13,7 +13,7 @@ namespace Agents.WorkersGroupAAgent
 		
 		public LinkedList<Worker> AvailableWorkers  { get; private set; } = new();
 
-		public EntitiesPriorityQueue<MyMessage> WorkersRequestsQueue  { get; private set; }
+		public EntitiesPriorityQueue<MyMessage> WorkersRequestsQueue { get; private set; }
 		
 		public WorkersGroupAAgent(int id, OSPABA.Simulation mySim, Agent parent) :
 			base(id, mySim, parent)

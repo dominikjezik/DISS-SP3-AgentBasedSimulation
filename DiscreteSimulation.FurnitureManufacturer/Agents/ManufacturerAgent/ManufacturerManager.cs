@@ -218,9 +218,9 @@ namespace Agents.ManufacturerAgent
 			worker.CurrentAssemblyLine.CurrentWorker = null;
 			
 			// Pokial bolo prave dokoncene Morenie vykonane pracovnikom C
-			// nasledujuca cinnost je Lakovanie tiez vykonava pracovnik C
+			// nasledujuca cinnost je Lakovanie (ak to nabytok vyžaduje) tiez vykonava pracovnik C
 			// Preto pracovnika C neuvolnime štandardne ale vykonáme na neho požiadavku s pripradnym uvolnením
-			if (furniture.CurrentOperationStep == FurnitureOperationStep.Stained)
+			if (furniture.CurrentOperationStep == FurnitureOperationStep.Stained && furniture.NeedsToBeVarnished)
 			{
 				// Opätovné vyžiadanie toho istého pracovníka C, pričom worker ostáva v správe
 				myMessage.Addressee = MySim.FindAgent(SimId.WorkersAgent);
@@ -252,6 +252,7 @@ namespace Agents.ManufacturerAgent
 				furniture.CurrentAssemblyLine.CurrentFurniture = null;
 				furniture.CurrentAssemblyLine = null;
 				
+				MyAgent.ProcessingFurnitureTime.AddValue(MySim.CurrentTime - furniture.Order.ArrivalTime);
 				
 				Notice(myMessage);
 
@@ -294,14 +295,13 @@ namespace Agents.ManufacturerAgent
 			{
 				myMessage.RequestedWorkerType = [WorkerGroup.GroupC];
 			}
-			else if (furniture.CurrentOperationStep == FurnitureOperationStep.Varnished)
+			else if (furniture.CurrentOperationStep == FurnitureOperationStep.Stained || furniture.CurrentOperationStep == FurnitureOperationStep.Varnished)
 			{
 				myMessage.RequestedWorkerType = [WorkerGroup.GroupB];
 			}
 			else if (furniture.CurrentOperationStep == FurnitureOperationStep.Folded)
 			{
-				// TODO: IBA DOCASNE BERIEME IBA SKUPINU C INAK JE BUD A ALEBO C
-				myMessage.RequestedWorkerType = [WorkerGroup.GroupC];
+				myMessage.RequestedWorkerType = [WorkerGroup.GroupC, WorkerGroup.GroupA];
 			}
 			else
 			{

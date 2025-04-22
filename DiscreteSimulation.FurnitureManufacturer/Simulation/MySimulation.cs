@@ -35,6 +35,8 @@ namespace Simulation
 		
 		public Statistics AverageProcessingOrderTime { get; private set; } = new();
 		
+		public Statistics AverageProcessingFurnitureTime { get; private set; } = new();
+		
 		public Statistics AveragePendingOrdersCount { get; private set; } = new();
     
 		public Statistics AveragePendingItemsForLineCount { get; private set; } = new();
@@ -59,12 +61,16 @@ namespace Simulation
 		
 		public Statistics AveragePendingItemsForWorkerMixWaitingTime { get; private set; } = new();
 		
+		public Statistics AverageAssemblyLinesUtilization { get; private set; } = new();
+		
 		public Statistics AverageWorkersGroupAUtilization { get; private set; } = new();
     
 		public Statistics AverageWorkersGroupBUtilization { get; private set; } = new();
     
 		public Statistics AverageWorkersGroupCUtilization { get; private set; } = new();
     
+		public Statistics[] AverageAllAssemblyLinesUtilization { get; private set; }
+		
 		public Statistics[] AverageAllWorkersUtilization { get; private set; }
 
 		#endregion
@@ -84,6 +90,7 @@ namespace Simulation
 		private void ClearStatistics()
 		{
 			AverageProcessingOrderTime.Clear();
+			AverageProcessingFurnitureTime.Clear();
 			
 			AveragePendingOrdersCount.Clear();
 			AveragePendingItemsForLineCount.Clear();
@@ -98,10 +105,19 @@ namespace Simulation
 			AveragePendingItemsForWorkerBWaitingTime.Clear();
 			AveragePendingItemsForWorkerCWaitingTime.Clear();
 			AveragePendingItemsForWorkerMixWaitingTime.Clear();
+
+			AverageAssemblyLinesUtilization.Clear();
 			
 			AverageWorkersGroupAUtilization.Clear();
 			AverageWorkersGroupBUtilization.Clear();
 			AverageWorkersGroupCUtilization.Clear();
+			
+			AverageAllAssemblyLinesUtilization = new Statistics[CountOfAssemblyLines];
+			
+			for (var i = 0; i < AverageAllAssemblyLinesUtilization.Length; i++)
+			{
+				AverageAllAssemblyLinesUtilization[i] = new Statistics();
+			}
 			
 			AverageAllWorkersUtilization = new Statistics[CountOfWorkersGroupA + CountOfWorkersGroupB + CountOfWorkersGroupC];
 			
@@ -129,6 +145,7 @@ namespace Simulation
 			}
 			
 			AverageProcessingOrderTime.AddValue(EnvironmentAgent.ProcessingOrderTime.Mean);
+			AverageProcessingFurnitureTime.AddValue(ManufacturerAgent.ProcessingFurnitureTime.Mean);
 			
 			AveragePendingOrdersCount.AddValue(ManufacturerAgent.PendingOrders.AverageQueueLength);
 			AveragePendingItemsForLineCount.AddValue(AssemblyLinesAgent.RequestsQueue.AverageQueueLength);
@@ -143,6 +160,14 @@ namespace Simulation
 			AveragePendingItemsForWorkerBWaitingTime.AddValue(WorkersAgent.WorkersBRequestsQueueWaitingTime.Mean);
 			AveragePendingItemsForWorkerCWaitingTime.AddValue(WorkersAgent.WorkersCRequestsQueueWaitingTime.Mean);
 			AveragePendingItemsForWorkerMixWaitingTime.AddValue(WorkersAgent.WorkersMixRequestsQueueWaitingTime.Mean);
+			
+			for (var i = 0; i < AssemblyLinesAgent.AssemblyLines.Length; i++)
+			{
+				AssemblyLinesAgent.AssemblyLines[i].RefreshStatistics();
+				AverageAllAssemblyLinesUtilization[i].AddValue(AssemblyLinesAgent.AssemblyLines[i].Utilization);
+			}
+			
+			AverageAssemblyLinesUtilization.AddValue(AssemblyLinesAgent.AssemblyLines.Average(assemblyLine => assemblyLine.Utilization));
 			
 	        for (var i = 0; i < WorkersGroupAAgent.Workers.Length; i++)
 	        {

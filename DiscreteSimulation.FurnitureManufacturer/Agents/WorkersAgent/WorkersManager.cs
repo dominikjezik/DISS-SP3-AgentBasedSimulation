@@ -60,12 +60,19 @@ namespace Agents.WorkersAgent
 			// Ak pozadujeme pracovnika, ktorý môže byť z rôznych skupín
 			else if (myMessage.RequestedWorkerType.Length == 2)
 			{
-				// TODO
-				throw new NotImplementedException();
+				// Zaradíme požiadavku CurrentlyCheckingMixedWorkersRequests
+				MyAgent.CurrentlyCheckingMixedWorkersRequests.Add(myMessage);
+				
+				// Teraz sa pre túto požiadavku skontroluje, či je voľný pracovník z niektorej jej požadovaných skupín
+				myMessage.Code = Mc.RequestWorkerIfAvailable;
+				myMessage.Furniture.StartedWaitingTime = MySim.CurrentTime;
+				myMessage.MixWorkerRequestedIndex = 0;
+
+				TryRequestFromNextGroup(myMessage);
 			}
 			else
 			{
-				throw new ArgumentException("Invalid worker group type.");
+				throw new ArgumentException("Invalid number of worker types.");
 			}
 		}
 
@@ -81,6 +88,11 @@ namespace Agents.WorkersAgent
 			}
 			else
 			{
+				if (MyAgent.MixedWorkersRequestsQueue.Count > 0)
+				{
+					myMessage.NotifyIfWorkerIsAvailable = true;
+				}
+				
 				if (myMessage.Worker.Group == WorkerGroup.GroupA)
 				{
 					myMessage.Addressee = MySim.FindAgent(SimId.WorkersGroupAAgent);
@@ -125,9 +137,8 @@ namespace Agents.WorkersAgent
 		{
 			var myMessage = (MyMessage)message;
 			
-			// Prebieha pokus o pridelenie pracovnika poziadavke na konkretneho pracovnika
-			// Je treba ale skontrolovat či v našich požiadavach na mix pracovníkov nie je prioritnejšia požiadavka
-			if (MyAgent.CurrentlyCheckingMixedWorkersRequests.Count == 0)
+			// Je treba skontrolovať či nemáme prioritnejšiu požiadavku na mix pracovníkov
+			if (MyAgent.MixedWorkersRequestsQueue.Count == 0 || MyAgent.CurrentlyCheckingMixedWorkersRequests.Count > 0)
 			{
 				// Nikto nevyžaduje pracovníka, môžeme spätne pridelit
 				if (workerGroup == WorkerGroup.GroupA)
@@ -148,10 +159,62 @@ namespace Agents.WorkersAgent
 			else
 			{
 				// Kontrola či je požiadavka prioritnejšia
+				var mixedWorkerRequest = MyAgent.MixedWorkersRequestsQueue.Peek();
 				
-				throw new NotImplementedException();
-				
-				// TODO: Nezabudnut na statistiky pre A, B, C a MIX
+				if (mixedWorkerRequest.RequestedWorkerType.Contains(myMessage.Worker.Group) && WorkerUtilities.RequestsComparator.Compare(mixedWorkerRequest, myMessage) == -1)
+				{
+					// Mixed požiadavka je prioritnejšia
+					var mixedWorkerRequestDequeued = MyAgent.MixedWorkersRequestsQueue.Dequeue();
+					mixedWorkerRequestDequeued.Worker = myMessage.Worker;
+					mixedWorkerRequestDequeued.Code = Mc.RequestWorker;
+					myMessage.Worker = null;
+					
+					MyAgent.WorkersARequestsQueueWaitingTime.AddValue(MySim.CurrentTime - mixedWorkerRequestDequeued.Furniture.StartedWaitingTime);
+					
+					Response(mixedWorkerRequestDequeued);
+					
+					// Pridáme späť do fronty aktuálnu požiadavku
+					if (workerGroup == WorkerGroup.GroupA)
+					{
+						myMessage.Addressee = MySim.FindAgent(SimId.WorkersGroupAAgent);
+						myMessage.Code = Mc.RequestWorker;
+						Request(myMessage);
+					}
+					else if (workerGroup == WorkerGroup.GroupB)
+					{
+						myMessage.Addressee = MySim.FindAgent(SimId.WorkersGroupBAgent);
+						myMessage.Code = Mc.RequestWorker;
+						Request(myMessage);
+					}
+					else if (workerGroup == WorkerGroup.GroupC)
+					{
+						myMessage.Addressee = MySim.FindAgent(SimId.WorkersGroupCAgent);
+						myMessage.Code = Mc.RequestWorker;
+						Request(myMessage);
+					}
+					else
+					{
+						throw new ArgumentException("Invalid worker group type.");
+					}
+				}
+				else
+				{
+					// Mixed požiadavka nie je prioritnejšia, môžeme spätne pridelit
+					if (workerGroup == WorkerGroup.GroupA)
+					{
+						MyAgent.WorkersARequestsQueueWaitingTime.AddValue(MySim.CurrentTime - myMessage.Furniture.StartedWaitingTime);
+					}
+					else if (workerGroup == WorkerGroup.GroupB)
+					{
+						MyAgent.WorkersBRequestsQueueWaitingTime.AddValue(MySim.CurrentTime - myMessage.Furniture.StartedWaitingTime);
+					}
+					else if (workerGroup == WorkerGroup.GroupC)
+					{
+						MyAgent.WorkersCRequestsQueueWaitingTime.AddValue(MySim.CurrentTime - myMessage.Furniture.StartedWaitingTime);
+					}
+					
+					Response(myMessage);
+				}
 			}
 		}
 
@@ -177,15 +240,79 @@ namespace Agents.WorkersAgent
 		{
 			// Prisla odpoved na poziadavku na pracovnika (pytali sme sa kvoli mix poziadavke)
 			var myMessage = (MyMessage)message;
-			var worker = myMessage.Worker;
 
-			if (worker == null)
+			if (myMessage.Worker != null)
 			{
+				// Dostali sme priradeného pracovníka, môžeme odoslať response
+				MyAgent.WorkersMixRequestsQueueWaitingTime.AddValue(MySim.CurrentTime - myMessage.Furniture.StartedWaitingTime);
+				myMessage.MixWorkerRequestedIndex = -1;
 				
+				// Odstránime zo zoznamu aktuálne kontrolovaných požiadaviek
+				MyAgent.CurrentlyCheckingMixedWorkersRequests.Remove(myMessage);
+				
+				myMessage.Code = Mc.RequestWorker;
+				Response(myMessage);
 			}
 			else
 			{
+				// Nedostali sme priradeného pracovníka, ak sme ešte neskontrolovali všetky prípustné skupiny,
+				// tak pokračujeme v pýtaní sa nasledujúcej skupiny
+				myMessage.MixWorkerRequestedIndex++;
 				
+				if (myMessage.MixWorkerRequestedIndex < myMessage.RequestedWorkerType.Length)
+				{
+					TryRequestFromNextGroup(myMessage);
+				}
+				else
+				{
+					// Skontrolovali sme všetky prípustné skupiny, nemáme priradeného pracovníka
+					myMessage.MixWorkerRequestedIndex = -1;
+					
+					// Odstránime zo zoznamu aktuálne kontrolovaných požiadaviek
+					MyAgent.CurrentlyCheckingMixedWorkersRequests.Remove(myMessage);
+					
+					// Pridáme do fronty mix požiadaviek
+					MyAgent.MixedWorkersRequestsQueue.Enqueue(myMessage);
+				}
+			}
+			
+			// Ak aktuálne nekontrolujeme žiadne mix požiadavky, tak spracujeme releasy
+			if (MyAgent.CurrentlyCheckingMixedWorkersRequests.Count == 0)
+			{
+				while (MyAgent.PendingReleases.Count > 0)
+				{
+					var releaseMessage = MyAgent.PendingReleases.Dequeue();
+					
+					if (MyAgent.MixedWorkersRequestsQueue.Count > 0)
+					{
+						releaseMessage.NotifyIfWorkerIsAvailable = true;
+					}
+					
+					ProcessReleaseWorker(releaseMessage);
+				}
+			}
+		}
+
+		private void TryRequestFromNextGroup(MyMessage myMessage)
+		{
+			if (myMessage.RequestedWorkerType[myMessage.MixWorkerRequestedIndex] == WorkerGroup.GroupC)
+			{
+				myMessage.Addressee = MySim.FindAgent(SimId.WorkersGroupCAgent);
+				Request(myMessage);
+			}
+			else if (myMessage.RequestedWorkerType[myMessage.MixWorkerRequestedIndex] == WorkerGroup.GroupA)
+			{
+				myMessage.Addressee = MySim.FindAgent(SimId.WorkersGroupAAgent);
+				Request(myMessage);
+			}
+			else if (myMessage.RequestedWorkerType[myMessage.MixWorkerRequestedIndex] == WorkerGroup.GroupB)
+			{
+				myMessage.Addressee = MySim.FindAgent(SimId.WorkersGroupBAgent);
+				Request(myMessage);
+			}
+			else
+			{
+				throw new ArgumentException("Invalid worker group type.");
 			}
 		}
 
@@ -200,16 +327,55 @@ namespace Agents.WorkersAgent
 		//meta! sender="WorkersGroupBAgent", id="77", type="Notice"
 		public void ProcessWorkerIsAvailableWorkersGroupBAgent(MessageForm message)
 		{
+			ProcessWorkerIsAvailable(message, WorkerGroup.GroupA);
 		}
 
 		//meta! sender="WorkersGroupAAgent", id="74", type="Notice"
 		public void ProcessWorkerIsAvailableWorkersGroupAAgent(MessageForm message)
 		{
+			ProcessWorkerIsAvailable(message, WorkerGroup.GroupB);
 		}
 
 		//meta! sender="WorkersGroupCAgent", id="75", type="Notice"
 		public void ProcessWorkerIsAvailableWorkersGroupCAgent(MessageForm message)
 		{
+			ProcessWorkerIsAvailable(message, WorkerGroup.GroupC);
+		}
+
+		private void ProcessWorkerIsAvailable(MessageForm message, WorkerGroup workerGroup)
+		{
+			MyMessage? requestToProcess = null;
+			var workers = new List<MyMessage>();
+
+			// Je to napísané takto všeobecne, ak by vyžadovalo viac krát rôzne kombinácie (napr. B/C, A/B)
+			// možno riešiť cez samostatné fronty pre každú možnú kombináciu
+			while (requestToProcess == null && MyAgent.MixedWorkersRequestsQueue.Count > 0)
+			{
+				requestToProcess = MyAgent.MixedWorkersRequestsQueue.Dequeue();
+
+				if (!requestToProcess.RequestedWorkerType.Contains(workerGroup))
+				{
+					workers.Add(requestToProcess);
+					requestToProcess = null;
+				}
+			}
+			
+			workers.ForEach(r => MyAgent.MixedWorkersRequestsQueue.Enqueue(r));
+
+			if (requestToProcess == null)
+			{
+				return;
+			}
+			
+			// Zaradíme požiadavku CurrentlyCheckingMixedWorkersRequests
+			MyAgent.CurrentlyCheckingMixedWorkersRequests.Add(requestToProcess);
+			
+			// Teraz sa opätovne pre túto požiadavku skontroluje, či je voľný pracovník z niektorej jej požadovaných skupín (mal by byť...)
+			requestToProcess.Code = Mc.RequestWorkerIfAvailable;
+			requestToProcess.Furniture.StartedWaitingTime = MySim.CurrentTime;
+			requestToProcess.MixWorkerRequestedIndex = 0;
+
+			TryRequestFromNextGroup(requestToProcess);
 		}
 
 		//meta! userInfo="Generated code: do not modify", tag="begin"

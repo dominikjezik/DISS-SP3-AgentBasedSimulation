@@ -30,8 +30,14 @@ public class MultipleReplicationsPanelViewModel : ViewModelBase
         {
             OnPropertyChanged(nameof(SimulationCurrentProcessingOrderTime));
             OnPropertyChanged(nameof(SimulationCurrentProcessingOrderTimeCI));
+            OnPropertyChanged(nameof(SimulationCurrentProcessingOrderItemTime));
+            OnPropertyChanged(nameof(SimulationCurrentProcessingOrderItemTimeCI));
             OnPropertyChanged(nameof(SimulationPendingOrdersWaitingTime));
             OnPropertyChanged(nameof(SimulationPendingOrdersWaitingTimeCI));
+            OnPropertyChanged(nameof(SimulationPendingItemsForLineWaitingTime));
+            OnPropertyChanged(nameof(SimulationPendingItemsForLineWaitingTimeCI));
+            OnPropertyChanged(nameof(SimulationPendingItemsForWorkerCWaitingTime));
+            OnPropertyChanged(nameof(SimulationPendingItemsForWorkerCWaitingTimeCI));
             OnPropertyChanged(nameof(SimulationPendingItemsForWorkerAWaitingTime));
             OnPropertyChanged(nameof(SimulationPendingItemsForWorkerAWaitingTimeCI));
             OnPropertyChanged(nameof(SimulationPendingItemsForWorkerBWaitingTime));
@@ -43,6 +49,13 @@ public class MultipleReplicationsPanelViewModel : ViewModelBase
 
     public void ResetForSimulationStart()
     {
+        SimulationAllAssemblyLinesUtilization = new ObservableCollection<AssemblyLineDTO>();
+        
+        for (int i = 0; i < Shared.CountOfAssemblyLines; i++)
+        {
+            SimulationAllAssemblyLinesUtilization.Add(new AssemblyLineDTO());
+        }
+        
         SimulationAllWorkersUtilization = new ObservableCollection<WorkerDTO>();
 
         for (int i = 0; i < Shared.CountOfWorkersGroupA + Shared.CountOfWorkersGroupB + Shared.CountOfWorkersGroupC; i++)
@@ -149,6 +162,56 @@ public class MultipleReplicationsPanelViewModel : ViewModelBase
 
         OnPropertyChanged(nameof(SimulationCurrentProcessingOrderTime));
         OnPropertyChanged(nameof(SimulationCurrentProcessingOrderTimeCI));
+    }
+    
+    private string _simulationCurrentProcessingOrderItemTimeSeconds = "-";
+    private string _simulationCurrentProcessingOrderItemTimeMinutes = "-";
+    private string _simulationCurrentProcessingOrderItemTimeHours = "-";
+    
+    public string SimulationCurrentProcessingOrderItemTime
+    {
+        get
+        {
+            return Shared.SelectedTimeUnits switch
+            {
+                "seconds" => _simulationCurrentProcessingOrderItemTimeSeconds,
+                "minutes" => _simulationCurrentProcessingOrderItemTimeMinutes,
+                "hours" => _simulationCurrentProcessingOrderItemTimeHours,
+                _ => "-"
+            };
+        }
+    }
+    
+    private string _simulationCurrentProcessingOrderItemTimeSecondsCI = "-";
+    private string _simulationCurrentProcessingOrderItemTimeMinutesCI = "-";
+    private string _simulationCurrentProcessingOrderItemTimeHoursCI = "-";
+    
+    public string SimulationCurrentProcessingOrderItemTimeCI
+    {
+        get
+        {
+            return Shared.SelectedTimeUnits switch
+            {
+                "seconds" => _simulationCurrentProcessingOrderItemTimeSecondsCI,
+                "minutes" => _simulationCurrentProcessingOrderItemTimeMinutesCI,
+                "hours" => _simulationCurrentProcessingOrderItemTimeHoursCI,
+                _ => "-"
+            };
+        }
+    }
+
+    public void SetSimulationCurrentProcessingOrderItemTime(double averageTime, double ciLowerTime, double ciUpperTime)
+    {
+        _simulationCurrentProcessingOrderItemTimeSeconds = $"{averageTime:F2}";
+        _simulationCurrentProcessingOrderItemTimeMinutes = $"{averageTime / 60:F2}";
+        _simulationCurrentProcessingOrderItemTimeHours = $"{averageTime / 3600:F2}";
+        
+        _simulationCurrentProcessingOrderItemTimeSecondsCI = $"<{ciLowerTime:F2} ; {ciUpperTime:F2}>";
+        _simulationCurrentProcessingOrderItemTimeMinutesCI = $"<{ciLowerTime / 60:F2} ; {ciUpperTime / 60:F2}>";
+        _simulationCurrentProcessingOrderItemTimeHoursCI = $"<{ciLowerTime / 3600:F2} ; {ciUpperTime / 3600:F2}>";
+
+        OnPropertyChanged(nameof(SimulationCurrentProcessingOrderItemTime));
+        OnPropertyChanged(nameof(SimulationCurrentProcessingOrderItemTimeCI));
     }
     
     private string _simulationPendingOrders = "-";
@@ -600,6 +663,31 @@ public class MultipleReplicationsPanelViewModel : ViewModelBase
     }
     
     
+    private string _simulationAssemblyLinesUtilization = "-";
+    
+    public string SimulationAssemblyLinesUtilization
+    {
+        get => _simulationAssemblyLinesUtilization;
+        set
+        {
+            _simulationAssemblyLinesUtilization = value;
+            OnPropertyChanged();
+        }
+    }
+    
+    private string _simulationAssemblyLinesUtilizationCI = "-";
+    
+    public string SimulationAssemblyLinesUtilizationCI
+    {
+        get => _simulationAssemblyLinesUtilizationCI;
+        set
+        {
+            _simulationAssemblyLinesUtilizationCI = value;
+            OnPropertyChanged();
+        }
+    }
+    
+    
     private string _simulationWorkersAUtilization = "-";
     
     public string SimulationWorkersAUtilization
@@ -668,6 +756,17 @@ public class MultipleReplicationsPanelViewModel : ViewModelBase
         set
         {
             _simulationWorkersCUtilizationCI = value;
+            OnPropertyChanged();
+        }
+    }
+    
+    private ObservableCollection<AssemblyLineDTO> _simulationAllAssemblyLinesUtilization = [];
+    
+    public ObservableCollection<AssemblyLineDTO> SimulationAllAssemblyLinesUtilization
+    {
+        get => _simulationAllAssemblyLinesUtilization;
+        set {
+            _simulationAllAssemblyLinesUtilization = value;
             OnPropertyChanged();
         }
     }

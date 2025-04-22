@@ -55,7 +55,7 @@ namespace Agents.OperationAgent.ContinualAssistants
 				isDiscrete: false,
 				[
 					new EmpiricalProbabilityTableItem(50 * 60, 70 * 60, 0.1),
-					new EmpiricalProbabilityTableItem(25 * 70, 150 * 60, 0.6),
+					new EmpiricalProbabilityTableItem(70 * 60, 150 * 60, 0.6),
 					new EmpiricalProbabilityTableItem(150 * 60, 200 * 60, 0.3),
 				],
 				mySimulation.SeedGenerator
@@ -125,7 +125,7 @@ namespace Agents.OperationAgent.ContinualAssistants
 						throw new Exception();
 				}
 			}
-			else if (furniture.CurrentOperationStep == FurnitureOperationStep.Stained)
+			else if (furniture.CurrentOperationStep == FurnitureOperationStep.Stained && furniture.NeedsToBeVarnished)
 			{
 				furniture.CurrentOperationStep = FurnitureOperationStep.Varnishing;
 				switch (furniture.Type)
@@ -143,7 +143,7 @@ namespace Agents.OperationAgent.ContinualAssistants
 						throw new Exception();
 				}
 			}
-			else if (furniture.CurrentOperationStep == FurnitureOperationStep.Varnished)
+			else if (furniture.CurrentOperationStep == FurnitureOperationStep.Stained || furniture.CurrentOperationStep == FurnitureOperationStep.Varnished)
 			{
 				furniture.CurrentOperationStep = FurnitureOperationStep.Folding;
 				switch (furniture.Type)

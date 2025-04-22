@@ -1,3 +1,4 @@
+using DiscreteSimulation.FurnitureManufacturer.Entities;
 using DiscreteSimulation.FurnitureManufacturer.Utilities;
 using OSPABA;
 using Simulation;
@@ -41,12 +42,15 @@ namespace Agents.WorkersGroupBAgent
 				// Je nastavený príznak pre notifikovanie parent agenta, pokial je k dispozícii volny pracovnik
 				myMessage.Addressee = MyAgent.Parent;
 				myMessage.Code = Mc.WorkerIsAvailable;
+				myMessage.NotifyIfWorkerIsAvailable = false;
 				
-				Response(myMessage);
+				MyAgent.AvailableWorkers.AddLast(worker);
+				
+				Notice(myMessage);
 			}
 			else
 			{
-				MyAgent.AvailableWorkers.Enqueue(worker, worker.Id);
+				MyAgent.AvailableWorkers.AddLast(worker);
 			}
 		}
 
@@ -91,7 +95,7 @@ namespace Agents.WorkersGroupBAgent
 			
 			if (MyAgent.AvailableWorkers.Count > 0)
 			{
-				var worker = MyAgent.AvailableWorkers.Dequeue();
+				var worker = GetAvailableWorker();
 				myMessage.Worker = worker;
 				
 				Response(myMessage);
@@ -109,7 +113,7 @@ namespace Agents.WorkersGroupBAgent
 			
 			if (MyAgent.AvailableWorkers.Count > 0)
 			{
-				var worker = MyAgent.AvailableWorkers.Dequeue();
+				var worker = GetAvailableWorker();
 				myMessage.Worker = worker;
 				
 				Response(myMessage);
@@ -117,8 +121,69 @@ namespace Agents.WorkersGroupBAgent
 			else
 			{
 				myMessage.Worker = null;
-				Request(myMessage);
+				Response(myMessage);
 			}
+		}
+		
+		private Worker GetAvailableWorker(AssemblyLine? preferredAssemblyLine = null)
+		{
+			var mySimulation = (MySimulation)MySim;
+			
+			// Ak je vypnuté preferovanie voľných pracovníkov na základe ich polohy,
+			// vrátime prvého voľného pracovníka
+			if (!mySimulation.EnableWorkerLocationPreference)
+			{
+				var firstWorker = MyAgent.AvailableWorkers.First.Value;
+				MyAgent.AvailableWorkers.RemoveFirst();
+				return firstWorker;
+			}
+			
+			
+			LinkedListNode<Worker>? availableWorker = null;
+			LinkedListNode<Worker>? availableWorkerFromWarehouse = null;
+
+			// Preferujeme najskôr pracovníka, ktorý sa už na danej linke nachádza,
+			// inak pracovníka, ktorý je v sklade (E(X) príchodu zo skladu je menší
+			// ako E(X) príchodu z inej linky) inak iný voľný pracovník
+			var node = MyAgent.AvailableWorkers.First;
+			
+			while (node != null)
+			{
+				if (availableWorker == null)
+				{
+					availableWorker = node;
+				}
+			
+				if (node.Value.CurrentAssemblyLine == preferredAssemblyLine)
+				{
+					var worker = node.Value;
+					MyAgent.AvailableWorkers.Remove(node);
+					return worker;
+				}
+			
+				if (node.Value.IsInWarehouse && availableWorkerFromWarehouse == null)
+				{
+					availableWorkerFromWarehouse = node;
+				}
+				
+				node = node.Next;
+			}
+			
+			if (availableWorkerFromWarehouse != null)
+			{
+				var worker = availableWorkerFromWarehouse.Value;
+				MyAgent.AvailableWorkers.Remove(availableWorkerFromWarehouse);
+				return worker;
+			}
+			
+			if (availableWorker != null)
+			{
+				var worker = availableWorker.Value;
+				MyAgent.AvailableWorkers.Remove(availableWorker);
+				return worker;
+			}
+			
+			throw new Exception("No available worker found");
 		}
 
 		//meta! userInfo="Process messages defined in code", id="0"

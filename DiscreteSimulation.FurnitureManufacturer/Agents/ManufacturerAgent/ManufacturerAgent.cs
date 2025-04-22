@@ -16,6 +16,8 @@ namespace Agents.ManufacturerAgent
 		
 		public Statistics PendingOrdersWaitingTime { get; private set; } = new();
 		
+		public Statistics ProcessingFurnitureTime { get; private set; } = new();
+		
 		public ManufacturerAgent(int id, OSPABA.Simulation mySim, Agent parent) :
 			base(id, mySim, parent)
 		{
@@ -32,6 +34,7 @@ namespace Agents.ManufacturerAgent
 			UnfinishedOrders.Clear();
 			PendingOrders.Clear();
 			PendingOrdersWaitingTime.Clear();
+			ProcessingFurnitureTime.Clear();
 		}
 
 		//meta! userInfo="Generated code: do not modify", tag="begin"

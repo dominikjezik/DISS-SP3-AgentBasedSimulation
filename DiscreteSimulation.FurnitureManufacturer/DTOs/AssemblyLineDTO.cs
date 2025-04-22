@@ -10,6 +10,7 @@ public class AssemblyLineDTO : INotifyPropertyChanged, IUpdatable<AssemblyLineDT
     private string _currentOrder;
     private string _currentWorker;
     private string _state;
+    private string _utilization;
 
     public int Id
     {
@@ -65,6 +66,17 @@ public class AssemblyLineDTO : INotifyPropertyChanged, IUpdatable<AssemblyLineDT
             OnPropertyChanged(nameof(State));
         }
     }
+    
+    public string Utilization
+    {
+        get => _utilization;
+        set
+        {
+            if (value == _utilization) return;
+            _utilization = value;
+            OnPropertyChanged(nameof(Utilization));
+        }
+    }
 
     public void Update(AssemblyLine assemblyLine)
     {
@@ -99,6 +111,8 @@ public class AssemblyLineDTO : INotifyPropertyChanged, IUpdatable<AssemblyLineDT
             CurrentWorker = CurrentWorker.Remove(CurrentWorker.Length - 2);
             CurrentWorker += ")";
         }
+        
+        Utilization = assemblyLine.Utilization.ToString("0.00%");
     }
     
     public void Update(AssemblyLineDTO assemblyLineDTO)
@@ -108,6 +122,7 @@ public class AssemblyLineDTO : INotifyPropertyChanged, IUpdatable<AssemblyLineDT
         CurrentWorker = assemblyLineDTO.CurrentWorker;
         State = assemblyLineDTO.State;
         StatusColor = assemblyLineDTO.StatusColor;
+        Utilization = assemblyLineDTO.Utilization;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -125,5 +140,16 @@ public static class AssemblyLineDTOExtensions
         var assemblyLineDTO = new AssemblyLineDTO();
         assemblyLineDTO.Update(assemblyLine);
         return assemblyLineDTO;
+    }
+    
+    public static AssemblyLineDTO ToUtilizationDTO(this AssemblyLine assemblyLine, double mean, (double, double) utilization)
+    {
+        var dto = new AssemblyLineDTO();
+        dto.Update(assemblyLine);
+        
+        dto.Utilization = $"{(mean*100):F2}%";
+        dto.State = $"<{(utilization.Item1*100):F2} ; {(utilization.Item2*100):F2}>";
+        
+        return dto;
     }
 }

@@ -20,7 +20,10 @@ public class SingleReplicationPanelViewModel : ViewModelBase
         if (e.PropertyName == nameof(Shared.SelectedTimeUnits))
         {
             OnPropertyChanged(nameof(ReplicationOrderProcessingTime));
+            OnPropertyChanged(nameof(ReplicationOrderItemProcessingTime));
             OnPropertyChanged(nameof(ReplicationPendingOrdersWaitingTime));
+            OnPropertyChanged(nameof(ReplicationPendingItemsForLineWaitingTime));
+            OnPropertyChanged(nameof(ReplicationPendingItemsForWorkerCWaitingTime));
             OnPropertyChanged(nameof(ReplicationPendingItemsForWorkerAWaitingTime));
             OnPropertyChanged(nameof(ReplicationPendingItemsForWorkerBWaitingTime));
             OnPropertyChanged(nameof(ReplicationPendingItemsForWorkerMixWaitingTime));
@@ -133,6 +136,39 @@ public class SingleReplicationPanelViewModel : ViewModelBase
         _replicationOrderProcessingTimeHours = $"{averageTime / 3600:F2}";
         
         OnPropertyChanged(nameof(ReplicationOrderProcessingTime));
+    }
+    
+    
+    private string _replicationOrderItemProcessingTimeSeconds = "-";
+    private string _replicationOrderItemProcessingTimeMinutes = "-";
+    private string _replicationOrderItemProcessingTimeHours = "-";
+    
+    public string ReplicationOrderItemProcessingTime
+    {
+        get
+        {
+            return Shared.SelectedTimeUnits switch
+            {
+                "seconds" => _replicationOrderItemProcessingTimeSeconds,
+                "minutes" => _replicationOrderItemProcessingTimeMinutes,
+                "hours" => _replicationOrderItemProcessingTimeHours,
+                _ => "-"
+            };
+        }
+    }
+    
+    public void SetReplicationOrderItemProcessingTime(double averageTime)
+    {
+        if (double.IsNaN(averageTime))
+        {
+            averageTime = 0;
+        }
+        
+        _replicationOrderItemProcessingTimeSeconds = $"{averageTime:F2}";
+        _replicationOrderItemProcessingTimeMinutes = $"{averageTime / 60:F2}";
+        _replicationOrderItemProcessingTimeHours = $"{averageTime / 3600:F2}";
+        
+        OnPropertyChanged(nameof(ReplicationOrderItemProcessingTime));
     }
     
     #endregion
@@ -409,6 +445,22 @@ public class SingleReplicationPanelViewModel : ViewModelBase
     
     #endregion
     
+    #region StatisticsAssemblyLines
+    
+    private string _replicationAssemblyLinesUtilization = "-";
+    
+    public string ReplicationAssemblyLinesUtilization
+    {
+        get => _replicationAssemblyLinesUtilization;
+        set
+        {
+            _replicationAssemblyLinesUtilization = value;
+            OnPropertyChanged();
+        }
+    }
+    
+    #endregion
+    
     #region StatisticsWorkers
     
     private string _replicationWorkersGroupAUtilization = "-";
@@ -594,7 +646,7 @@ public class SingleReplicationPanelViewModel : ViewModelBase
             OnPropertyChanged(nameof(PendingForStainingQueueTabTitle));
         }
     }
-    public string PendingForStainingQueueTabTitle => $"for Worker A ({PendingItemsForWorkerAQueueCount})";
+    public string PendingForStainingQueueTabTitle => $"for A ({PendingItemsForWorkerAQueueCount})";
     
     
     private string _pendingItemsForWorkerCQueueCount = "0";
@@ -610,7 +662,7 @@ public class SingleReplicationPanelViewModel : ViewModelBase
         }
     }
     
-    public string PendingItemsForWorkerCQueueTabTitle => $"for Worker C ({PendingItemsForWorkerCQueueCount})";
+    public string PendingItemsForWorkerCQueueTabTitle => $"for C ({PendingItemsForWorkerCQueueCount})";
     
     
     private string _pendingItemsForWorkerBQueueCount = "0";
@@ -626,7 +678,7 @@ public class SingleReplicationPanelViewModel : ViewModelBase
         }
     }
     
-    public string PendingItemsForWorkerBQueueTabTitle => $"for Worker B ({PendingItemsForWorkerBQueueCount})";
+    public string PendingItemsForWorkerBQueueTabTitle => $"for B ({PendingItemsForWorkerBQueueCount})";
 
     
     private string _pendingItemsForWorkerMixQueueCount = "0";
@@ -642,7 +694,7 @@ public class SingleReplicationPanelViewModel : ViewModelBase
         }
     }
     
-    public string PendingItemsForWorkerMixQueueTabTitle => $"for Worker A/C ({PendingItemsForWorkerMixQueueCount})";
+    public string PendingItemsForWorkerMixQueueTabTitle => $"for A/C ({PendingItemsForWorkerMixQueueCount})";
     
     private ObservableCollection<OrderDTO> _pendingOrdersQueue = [];
 

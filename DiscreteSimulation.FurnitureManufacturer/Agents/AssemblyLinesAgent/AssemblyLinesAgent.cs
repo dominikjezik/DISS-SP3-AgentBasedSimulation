@@ -50,7 +50,7 @@ namespace Agents.AssemblyLinesAgent
 			
 			for (int i = 0; i < count; i++)
 			{
-				var assemblyLine = new AssemblyLine
+				var assemblyLine = new AssemblyLine(MySim)
 				{
 					Id = i + 1
 				};

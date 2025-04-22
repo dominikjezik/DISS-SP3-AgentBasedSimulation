@@ -10,6 +10,8 @@ public class Furniture
     
     public FurnitureType Type { get; set; }
     
+    public bool NeedsToBeVarnished { get; set; }
+    
     public AssemblyLine? CurrentAssemblyLine { get; set; }
     
     public Worker? CurrentWorker { get; set; }
