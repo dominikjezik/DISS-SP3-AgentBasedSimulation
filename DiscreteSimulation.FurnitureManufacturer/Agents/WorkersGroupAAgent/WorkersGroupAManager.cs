@@ -95,7 +95,7 @@ namespace Agents.WorkersGroupAAgent
 			
 			if (MyAgent.AvailableWorkers.Count > 0)
 			{
-				var worker = GetAvailableWorker();
+				var worker = GetAvailableWorker(myMessage.Furniture?.CurrentAssemblyLine);
 				myMessage.Worker = worker;
 				
 				Response(myMessage);
@@ -113,7 +113,7 @@ namespace Agents.WorkersGroupAAgent
 			
 			if (MyAgent.AvailableWorkers.Count > 0)
 			{
-				var worker = GetAvailableWorker();
+				var worker = GetAvailableWorker(myMessage.Furniture?.CurrentAssemblyLine);
 				myMessage.Worker = worker;
 				
 				Response(myMessage);
@@ -161,7 +161,7 @@ namespace Agents.WorkersGroupAAgent
 					return worker;
 				}
 			
-				if (node.Value.IsInWarehouse && availableWorkerFromWarehouse == null)
+				if (preferredAssemblyLine != null && node.Value.IsInWarehouse && availableWorkerFromWarehouse == null)
 				{
 					availableWorkerFromWarehouse = node;
 				}

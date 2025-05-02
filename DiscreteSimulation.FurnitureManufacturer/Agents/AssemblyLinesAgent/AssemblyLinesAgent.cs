@@ -50,10 +50,7 @@ namespace Agents.AssemblyLinesAgent
 			
 			for (int i = 0; i < count; i++)
 			{
-				var assemblyLine = new AssemblyLine(MySim)
-				{
-					Id = i + 1
-				};
+				var assemblyLine = new AssemblyLine(MySim, i + 1);
 				
 				AssemblyLines[i] = assemblyLine;
 				AvailableAssemblyLines.Enqueue(assemblyLine, assemblyLine.Id);

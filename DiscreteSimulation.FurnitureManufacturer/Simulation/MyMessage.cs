@@ -13,6 +13,8 @@ namespace Simulation
 		
 		public Worker Worker { get; set; }
 		
+		public Warehouse Warehouse { get; set; }
+		
 		public bool IsTransferBetweenLines { get; set; }
 
 		public WorkerGroup[] RequestedWorkerType { get; set; }
@@ -47,6 +49,7 @@ namespace Simulation
 			Furniture = original.Furniture;
 			AssemblyLine = original.AssemblyLine;
 			Worker = original.Worker;
+			Warehouse = original.Warehouse;
 			IsTransferBetweenLines = original.IsTransferBetweenLines;
 			RequestedWorkerType = original.RequestedWorkerType;
 			NotifyIfWorkerIsAvailable = original.NotifyIfWorkerIsAvailable;

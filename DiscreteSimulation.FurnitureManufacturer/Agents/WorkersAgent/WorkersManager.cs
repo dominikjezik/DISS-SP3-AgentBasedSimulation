@@ -169,7 +169,7 @@ namespace Agents.WorkersAgent
 					mixedWorkerRequestDequeued.Code = Mc.RequestWorker;
 					myMessage.Worker = null;
 					
-					MyAgent.WorkersARequestsQueueWaitingTime.AddValue(MySim.CurrentTime - mixedWorkerRequestDequeued.Furniture.StartedWaitingTime);
+					MyAgent.WorkersMixRequestsQueueWaitingTime.AddValue(MySim.CurrentTime - mixedWorkerRequestDequeued.Furniture.StartedWaitingTime);
 					
 					Response(mixedWorkerRequestDequeued);
 					

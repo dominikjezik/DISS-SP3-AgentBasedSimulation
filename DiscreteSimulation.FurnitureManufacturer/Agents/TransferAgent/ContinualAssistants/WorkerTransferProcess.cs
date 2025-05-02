@@ -1,6 +1,8 @@
+using System.Drawing;
 using OSPABA;
 using Agents.TransferAgent;
 using DiscreteSimulation.Core.Generators;
+using DiscreteSimulation.FurnitureManufacturer.Utilities;
 using Simulation;
 namespace Agents.TransferAgent.ContinualAssistants
 {
@@ -39,31 +41,138 @@ namespace Agents.TransferAgent.ContinualAssistants
 				// Presun medzi linkami
 				myMessage.Worker.IsMovingToAssemblyLine = true;
 				
+				var transferDuration = _arrivalTimeBetweenTwoLinesGenerator.Next();
+				
+				RunAnimationOnWorkerTransferBetweenLines(myMessage, transferDuration);
+				
 				// Odstranime pracovnika z jeho aktualnej linky
 				myMessage.Worker.CurrentAssemblyLine.IdleWorkers.Remove(myMessage.Worker);
 				myMessage.Worker.CurrentAssemblyLine = null;
 				
-				Hold(_arrivalTimeBetweenTwoLinesGenerator.Next(), message);
+				Hold(transferDuration, message);
 			}
 			else
 			{
+				var transferDuration = _arrivalTimeBetweenLineAndWarehouseGenerator.Next();
+				
 				if (myMessage.Worker.IsInWarehouse)
 				{
 					// Presun zo skladu na linku
 					myMessage.Worker.IsMovingToAssemblyLine = true;
+					
+					RunAnimationOnWorkerTransferFromWarehouseToLine(myMessage, transferDuration);
 				}
 				else
 				{
 					// Presun z linky do skladu
 					myMessage.Worker.IsMovingToWarehouse = true;
+					
+					RunAnimationOnWorkerTransferToWarehouse(myMessage, transferDuration);
 
 					// Odstranime pracovnika z jeho aktualnej linky
 					myMessage.Worker.CurrentAssemblyLine.IdleWorkers.Remove(myMessage.Worker);
 					myMessage.Worker.CurrentAssemblyLine = null;
 				}
 				
-				Hold(_arrivalTimeBetweenLineAndWarehouseGenerator.Next(), message);
+				Hold(transferDuration, message);
 			}
+		}
+
+		private void RunAnimationOnWorkerTransferFromWarehouseToLine(MyMessage message, double transferDuration)
+		{
+			var destinationAssemblyLine = message.AssemblyLine;
+
+			PointF [] transferPath;
+			
+			if (message.Worker.Group == WorkerGroup.GroupA)
+			{
+				transferPath = [
+					message.Warehouse.WarehouseSections[message.Worker.Id - 1].CurrentWorkerPosition,
+					message.Warehouse.WarehouseSections[message.Worker.Id - 1].GatewayPosition,
+					message.Warehouse.GatewayPosition,
+					message.Warehouse.CrossroadPosition,
+					destinationAssemblyLine.CrossroadPosition,
+					destinationAssemblyLine.GatewayPosition,
+					destinationAssemblyLine.EntrancePosition,
+					destinationAssemblyLine.CurrentWorkerPosition
+				];
+			}
+			else if (message.Worker.Group == WorkerGroup.GroupB)
+			{
+				transferPath = [
+					message.Warehouse.WorkersGroupBIdlePosition,
+					message.Warehouse.GatewayPositionIdleBCWorkers,
+					message.Warehouse.GatewayPosition,
+					message.Warehouse.CrossroadPosition,
+					destinationAssemblyLine.CrossroadPosition,
+					destinationAssemblyLine.GatewayPosition,
+					destinationAssemblyLine.EntrancePosition,
+					destinationAssemblyLine.CurrentWorkerPosition
+				];
+			}
+			else
+			{
+				transferPath = [
+					message.Warehouse.WorkersGroupCIdlePosition,
+					message.Warehouse.GatewayPositionIdleBCWorkers,
+					message.Warehouse.GatewayPosition,
+					message.Warehouse.CrossroadPosition,
+					destinationAssemblyLine.CrossroadPosition,
+					destinationAssemblyLine.GatewayPosition,
+					destinationAssemblyLine.EntrancePosition,
+					destinationAssemblyLine.CurrentWorkerPosition
+				];
+			}
+			
+			message.Worker.AnimateTransfer(MySim.CurrentTime, transferDuration, transferPath);
+		}
+		
+		private void RunAnimationOnWorkerTransferToWarehouse(MyMessage message, double transferDuration)
+		{
+			var currentAssemblyLine = message.Worker.CurrentAssemblyLine;
+			
+			var transferPath = new [] {
+				currentAssemblyLine.GatewayPosition,
+				currentAssemblyLine.CrossroadPosition,
+				message.Warehouse.CrossroadPosition,
+				message.Warehouse.GatewayPosition,
+				message.Warehouse.WarehouseSections[message.Worker.Id - 1].GatewayPosition,
+				message.Warehouse.WarehouseSections[message.Worker.Id - 1].CurrentWorkerPosition
+			};
+			
+			message.Worker.AnimateTransfer(MySim.CurrentTime, transferDuration, transferPath);
+		}
+
+		private void RunAnimationOnWorkerTransferBetweenLines(MyMessage message, double transferDuration)
+		{
+			var currentAssemblyLine = message.Worker.CurrentAssemblyLine;
+			var destinationAssemblyLine = message.AssemblyLine;
+			
+			PointF[] transferPath;
+			
+			// Ak je predchadzajuca a nova linka na rovnakej urovni, nemuime ísť na crossroad
+			if (currentAssemblyLine.GatewayPosition == destinationAssemblyLine.GatewayPosition)
+			{
+				transferPath = [
+					currentAssemblyLine.GatewayPosition,
+					destinationAssemblyLine.GatewayPosition,
+					destinationAssemblyLine.EntrancePosition,
+					destinationAssemblyLine.CurrentWorkerPosition
+				];
+			}
+			else
+			{
+				transferPath = [
+					currentAssemblyLine.GatewayPosition,
+					currentAssemblyLine.CrossroadPosition,
+					destinationAssemblyLine.CrossroadPosition,
+					destinationAssemblyLine.GatewayPosition,
+					destinationAssemblyLine.EntrancePosition,
+					destinationAssemblyLine.CurrentWorkerPosition
+				];
+			}
+			
+			message.Worker.AnimateTransfer(MySim.CurrentTime, transferDuration, transferPath);
 		}
 		
 		public void ProcessWorkerTransferFinished(MessageForm message)
@@ -76,6 +185,8 @@ namespace Agents.TransferAgent.ContinualAssistants
 				myMessage.Worker.IsMovingToAssemblyLine = false;
 				myMessage.Worker.CurrentAssemblyLine = myMessage.AssemblyLine;
 				myMessage.AssemblyLine.CurrentWorker = myMessage.Worker;
+
+				myMessage.Worker.PlaceWorker(myMessage.AssemblyLine.CurrentWorkerPosition);
 			}
 			else
 			{
@@ -84,6 +195,8 @@ namespace Agents.TransferAgent.ContinualAssistants
 					// Pracovnik sa presunul do skladu
 					myMessage.Worker.IsMovingToWarehouse = false;
 					myMessage.Worker.IsInWarehouse = true;
+					
+					myMessage.Worker.PlaceWorker(myMessage.Warehouse.WarehouseSections[myMessage.Worker.Id - 1].CurrentWorkerPosition);
 				}
 				else
 				{
@@ -92,6 +205,8 @@ namespace Agents.TransferAgent.ContinualAssistants
 					myMessage.Worker.IsInWarehouse = false;
 					myMessage.Worker.CurrentAssemblyLine = myMessage.AssemblyLine;
 					myMessage.AssemblyLine.CurrentWorker = myMessage.Worker;
+					
+					myMessage.Worker.PlaceWorker(myMessage.AssemblyLine.CurrentWorkerPosition);
 				}
 			}
 			

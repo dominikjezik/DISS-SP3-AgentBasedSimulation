@@ -92,7 +92,7 @@ namespace Agents.EnvironmentAgent.ContinualAssistants
 		
 		private Order GenerateOrder()
 		{
-			var order = new Order
+			var order = new Order(MySim)
 			{
 				Id = ++_ordersCounter,
 				State = OrderState.Pending,
@@ -137,13 +137,12 @@ namespace Agents.EnvironmentAgent.ContinualAssistants
 			
 			var needsToBeVarnishedProbability = _needsToBeVarnishedGenerator.Next();
 
-			var furniture = new Furniture
+			var furniture = new Furniture(MySim)
 			{
 				Type = furnitureType,
 				NeedsToBeVarnished = needsToBeVarnishedProbability < 0.15,
 				StartedWaitingTime = MySim.CurrentTime,
-				CurrentOperationStep = FurnitureOperationStep.NotStarted,
-				State = "Pending"
+				CurrentOperationStep = FurnitureOperationStep.NotStarted
 			};
 			
 			return furniture;

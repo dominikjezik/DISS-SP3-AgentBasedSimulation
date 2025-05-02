@@ -72,6 +72,11 @@ public partial class MainWindow : Window
 
     private void StopSimulationButton_OnClick(object? sender, RoutedEventArgs e)
     {
+        if (_viewModel.Simulation.AnimatorExists)
+        {
+            _viewModel.Shared.DeleteAnimator();
+        }
+        
         _stopSimulationRequested = true;
         _viewModel.Simulation.StopSimulation();
     }
@@ -85,6 +90,8 @@ public partial class MainWindow : Window
     private void IncreaseSpeedSimulationButton_OnClick(object? sender, RoutedEventArgs e) => _viewModel.IncreaseSpeed();
     
     private void SpeedMaxSimulationButton_OnClick(object? sender, RoutedEventArgs e) => _viewModel.SetMaxSpeed();
+    
+    private void DeleteAnimatorButton_OnClick(object? sender, RoutedEventArgs e) => _viewModel.Shared.DeleteAnimator();
 
     private double _latestGUIUpdate = -1;
 

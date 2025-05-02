@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Windows;
 using DiscreteSimulation.FurnitureManufacturer;
 using Simulation;
 
@@ -21,7 +22,7 @@ public class SharedViewModel : ViewModelBase
         _simulation.OnReplicationDidFinish(simulation => ReplicationEnded?.Invoke(simulation));
     }
     
-    private int _replications = 10;
+    private int _replications = 1;
     
     public int Replications
     {
@@ -205,7 +206,7 @@ public class SharedViewModel : ViewModelBase
         }
     }
     
-    private bool _enableWorkerLocationPreference = false;
+    private bool _enableWorkerLocationPreference = true;
     
     public bool EnableWorkerLocationPreference
     {
@@ -227,5 +228,29 @@ public class SharedViewModel : ViewModelBase
             _enableRender95ConfidenceInterval = value;
             OnPropertyChanged();
         }
+    }
+    
+    private bool _isAnimatorOn = false;
+    
+    public bool IsAnimatorOn
+    {
+        get => _isAnimatorOn;
+        set
+        {
+            _isAnimatorOn = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(IsAnimatorOff));
+        }
+    }
+    
+    public bool IsAnimatorOff => !IsAnimatorOn;
+    
+    public event Action? AnimatorDeleted;
+
+    public void DeleteAnimator()
+    {
+        Simulation.RemoveAnimator();
+        IsAnimatorOn = false;
+        AnimatorDeleted?.Invoke();
     }
 }

@@ -8,6 +8,8 @@ namespace Agents.ManufacturerAgent
 	//meta! id="4"
 	public class ManufacturerAgent : OSPABA.Agent
 	{
+		public Warehouse Warehouse { get; private set; }
+		
 		public List<Order> AllOrders { get; private set; } = new();
 		
 		public LinkedList<MyMessage> UnfinishedOrders { get; private set; } = new();
@@ -29,6 +31,8 @@ namespace Agents.ManufacturerAgent
 		{
 			base.PrepareReplication();
 			// Setup component for the next replication
+
+			Warehouse = new Warehouse(MySim);
 			
 			AllOrders.Clear();
 			UnfinishedOrders.Clear();

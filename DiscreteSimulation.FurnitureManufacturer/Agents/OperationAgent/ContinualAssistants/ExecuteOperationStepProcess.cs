@@ -87,92 +87,83 @@ namespace Agents.OperationAgent.ContinualAssistants
 			if (furniture.CurrentOperationStep == FurnitureOperationStep.NotStarted)
 			{
 				furniture.CurrentOperationStep = FurnitureOperationStep.MaterialPreparationInWarehouse;
-				Hold(_materialPreparationTimeGenerator.Next(), myMessage);
+				var preparationDuration = _materialPreparationTimeGenerator.Next();
+				
+				myMessage.Warehouse.WarehouseSections[furniture.CurrentWorker.Id - 1].AnimatePreparationStep(preparationDuration);
+				Hold(preparationDuration, myMessage);
 			}
 			else if (furniture.CurrentOperationStep == FurnitureOperationStep.MaterialPrepared)
 			{
 				furniture.CurrentOperationStep = FurnitureOperationStep.Cutting;
-				switch (furniture.Type)
+				
+				var operationDuration = furniture.Type switch
 				{
-					case FurnitureType.Desk:
-						Hold(_cuttingDeskTimeGenerator.Next(), myMessage);
-						break;
-					case FurnitureType.Chair:
-						Hold(_cuttingChairTimeGenerator.Next(), myMessage);
-						break;
-					case FurnitureType.Closet:
-						Hold(_cuttingClosetTimeGenerator.Next(), myMessage);
-						break;
-					default:
-						throw new Exception();
-				}
+					FurnitureType.Desk => _cuttingDeskTimeGenerator.Next(),
+					FurnitureType.Chair => _cuttingChairTimeGenerator.Next(),
+					FurnitureType.Closet => _cuttingClosetTimeGenerator.Next(),
+					_ => throw new Exception()
+				};
+
+				furniture.CurrentAssemblyLine.AnimateOperationStep(operationDuration);
+				Hold(operationDuration, myMessage);
 			}
 			else if (furniture.CurrentOperationStep == FurnitureOperationStep.Cut)
 			{
 				furniture.CurrentOperationStep = FurnitureOperationStep.Staining;
-				switch (furniture.Type)
+				
+				var operationDuration = furniture.Type switch
 				{
-					case FurnitureType.Desk:
-						Hold(_stainingDeskTimeGenerator.Next(), myMessage);
-						break;
-					case FurnitureType.Chair:
-						Hold(_stainingChairTimeGenerator.Next(), myMessage);
-						break;
-					case FurnitureType.Closet:
-						Hold(_stainingClosetTimeGenerator.Next(), myMessage);
-						break;
-					default:
-						throw new Exception();
-				}
+					FurnitureType.Desk => _stainingDeskTimeGenerator.Next(),
+					FurnitureType.Chair => _stainingChairTimeGenerator.Next(),
+					FurnitureType.Closet => _stainingClosetTimeGenerator.Next(),
+					_ => throw new Exception()
+				};
+				
+				furniture.CurrentAssemblyLine.AnimateOperationStep(operationDuration);
+				Hold(operationDuration, myMessage);
 			}
 			else if (furniture.CurrentOperationStep == FurnitureOperationStep.Stained && furniture.NeedsToBeVarnished)
 			{
 				furniture.CurrentOperationStep = FurnitureOperationStep.Varnishing;
-				switch (furniture.Type)
+				
+				var operationDuration = furniture.Type switch
 				{
-					case FurnitureType.Desk:
-						Hold(_varnishingDeskTimeGenerator.Next(), myMessage);
-						break;
-					case FurnitureType.Chair:
-						Hold(_varnishingChairTimeGenerator.Next(), myMessage);
-						break;
-					case FurnitureType.Closet:
-						Hold(_varnishingClosetTimeGenerator.Next(), myMessage);
-						break;
-					default:
-						throw new Exception();
-				}
+					FurnitureType.Desk => _varnishingDeskTimeGenerator.Next(),
+					FurnitureType.Chair => _varnishingChairTimeGenerator.Next(),
+					FurnitureType.Closet => _varnishingClosetTimeGenerator.Next(),
+					_ => throw new Exception()
+				};
+				
+				furniture.CurrentAssemblyLine.AnimateOperationStep(operationDuration);
+				Hold(operationDuration, myMessage);
 			}
 			else if (furniture.CurrentOperationStep == FurnitureOperationStep.Stained || furniture.CurrentOperationStep == FurnitureOperationStep.Varnished)
 			{
 				furniture.CurrentOperationStep = FurnitureOperationStep.Folding;
-				switch (furniture.Type)
+				
+				var operationDuration = furniture.Type switch
 				{
-					case FurnitureType.Desk:
-						Hold(_foldingDeskTimeGenerator.Next(), myMessage);
-						break;
-					case FurnitureType.Chair:
-						Hold(_foldingChairTimeGenerator.Next(), myMessage);
-						break;
-					case FurnitureType.Closet:
-						Hold(_foldingClosetTimeGenerator.Next(), myMessage);
-						break;
-					default:
-						throw new Exception();
-				}
+					FurnitureType.Desk => _foldingDeskTimeGenerator.Next(),
+					FurnitureType.Chair => _foldingChairTimeGenerator.Next(),
+					FurnitureType.Closet => _foldingClosetTimeGenerator.Next(),
+					_ => throw new Exception()
+				};
+				
+				furniture.CurrentAssemblyLine.AnimateOperationStep(operationDuration);
+				Hold(operationDuration, myMessage);
 			}
 			else if (furniture.CurrentOperationStep == FurnitureOperationStep.Folded)
 			{
 				furniture.CurrentOperationStep = FurnitureOperationStep.AssemblingFittings;
 				
-				if (furniture.Type == FurnitureType.Closet)
+				var operationDuration = furniture.Type switch
 				{
-					Hold(_assemblyOfFittingsOnClosetTimeGenerator.Next(), myMessage);
-				}
-				else
-				{
-					throw new Exception($"Only closet can be assembled - {furniture.Type}");
-				}
+					FurnitureType.Closet => _assemblyOfFittingsOnClosetTimeGenerator.Next(),
+					_ => throw new Exception($"Only closet can be assembled - {furniture.Type}")
+				};
+				
+				furniture.CurrentAssemblyLine.AnimateOperationStep(operationDuration);
+				Hold(operationDuration, myMessage);
 			}
 			else
 			{
@@ -197,6 +188,15 @@ namespace Agents.OperationAgent.ContinualAssistants
 			
 			// Poznačíme čas dokončenia výrobného kroku
 			myMessage.Furniture.OperationStepEndTime = MySim.CurrentTime;
+
+			if (myMessage.Furniture.CurrentOperationStep == FurnitureOperationStep.MaterialPrepared)
+			{
+				myMessage.Warehouse.WarehouseSections[myMessage.Furniture.CurrentWorker.Id - 1].HideOperationStepProgressBar();
+			}
+			else
+			{
+				myMessage.Furniture.CurrentAssemblyLine?.HideOperationStepProgressBar();
+			}
 			
 			message.Addressee = MyAgent;
 			AssistantFinished(message);

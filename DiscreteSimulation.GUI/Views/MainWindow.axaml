@@ -85,6 +85,18 @@
                     IsEnabled="{Binding IsSpeedMaxButtonEnabled}">
                     MAX
                 </Button>
+                
+                <ToggleButton
+                    Margin="10,10,0,0"
+                    IsChecked="{Binding Shared.IsAnimatorOn}">
+                    Animator
+                    
+                    <ToggleButton.ContextMenu>
+                        <ContextMenu >
+                            <MenuItem Header="Delete Animator" Click="DeleteAnimatorButton_OnClick" />
+                        </ContextMenu>
+                    </ToggleButton.ContextMenu>
+                </ToggleButton>
             </StackPanel>
         </StackPanel>
         

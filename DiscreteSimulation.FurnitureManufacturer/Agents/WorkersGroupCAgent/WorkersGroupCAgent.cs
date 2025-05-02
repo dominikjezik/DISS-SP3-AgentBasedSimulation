@@ -49,12 +49,7 @@ namespace Agents.WorkersGroupCAgent
 			
 			for (int i = 0; i < count; i++)
 			{
-				var worker = new Worker(MySim)
-				{
-					Id = i + 1,
-					Group = WorkerGroup.GroupC,
-					IsInWarehouse = true
-				};
+				var worker = new Worker(MySim, i + 1, WorkerGroup.GroupC);
 				
 				Workers[i] = worker;
 				AvailableWorkers.AddLast(worker);

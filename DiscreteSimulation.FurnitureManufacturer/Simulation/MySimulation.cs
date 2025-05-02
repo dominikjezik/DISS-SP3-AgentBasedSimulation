@@ -74,11 +74,31 @@ namespace Simulation
 		public Statistics[] AverageAllWorkersUtilization { get; private set; }
 
 		#endregion
+
+		public event Action AnimatorCreated;
+		
+		public event Action AnimatorRemoved;
 		
 		public MySimulation()
 		{
 			SeedGenerator = new SeedGenerator();
 			Init();
+			
+			OnAnimatorWasCreated((_, _) =>
+			{
+				if (CurrentTime != 0)
+				{
+					AnimatorCreated?.Invoke();
+				}
+			});
+			
+			OnAnimatorWasRemoved(_ =>
+			{
+				if (CurrentTime != 0)
+				{
+					AnimatorRemoved?.Invoke();
+				}
+			});
 		}
 
 		override public void PrepareSimulation()
@@ -129,8 +149,17 @@ namespace Simulation
 
 		override public void PrepareReplication()
 		{
+			// Zrušenie všetkých callbackov v AnimatorCreated a AnimatorRemoved
+			AnimatorCreated = null;
+			AnimatorRemoved = null;
+			
 			base.PrepareReplication();
 			// Reset entities, queues, local statistics, etc...
+
+			if (AnimatorExists)
+			{
+				AnimatorCreated?.Invoke();
+			}
 		}
 
 		override public void ReplicationFinished()

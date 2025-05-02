@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using DiscreteSimulation.FurnitureManufacturer.DTOs;
@@ -41,7 +42,13 @@ public class SingleReplicationPanelViewModel : ViewModelBase
                 Shared.Simulation.SetMaxSimSpeed();
             }
         }
+        else if (e.PropertyName == nameof(Shared.IsAnimatorOn))
+        {
+            AnimatorRequestChanged?.Invoke();
+        }
     }
+    
+    public event Action? AnimatorRequestChanged;
 
     public void ResetForSimulationStart()
     {

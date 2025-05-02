@@ -1,5 +1,5 @@
 ﻿using DiscreteSimulation.Console;
 
-var analyzer = new ConfigurationAnalyzer(8);
+var analyzer = new ConfigurationAnalyzer(4);
 
-await analyzer.AnalyzeConfigurationsAsync(100);
+await analyzer.AnalyzeConfigurationsAsync(1000);

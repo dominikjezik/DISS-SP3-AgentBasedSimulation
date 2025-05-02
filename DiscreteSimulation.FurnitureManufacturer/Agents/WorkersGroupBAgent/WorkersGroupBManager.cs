@@ -95,7 +95,7 @@ namespace Agents.WorkersGroupBAgent
 			
 			if (MyAgent.AvailableWorkers.Count > 0)
 			{
-				var worker = GetAvailableWorker();
+				var worker = GetAvailableWorker(myMessage.Furniture?.CurrentAssemblyLine);
 				myMessage.Worker = worker;
 				
 				Response(myMessage);
@@ -113,7 +113,7 @@ namespace Agents.WorkersGroupBAgent
 			
 			if (MyAgent.AvailableWorkers.Count > 0)
 			{
-				var worker = GetAvailableWorker();
+				var worker = GetAvailableWorker(myMessage.Furniture?.CurrentAssemblyLine);
 				myMessage.Worker = worker;
 				
 				Response(myMessage);
@@ -154,7 +154,7 @@ namespace Agents.WorkersGroupBAgent
 					availableWorker = node;
 				}
 			
-				if (node.Value.CurrentAssemblyLine == preferredAssemblyLine)
+				if (preferredAssemblyLine != null && node.Value.CurrentAssemblyLine == preferredAssemblyLine)
 				{
 					var worker = node.Value;
 					MyAgent.AvailableWorkers.Remove(node);

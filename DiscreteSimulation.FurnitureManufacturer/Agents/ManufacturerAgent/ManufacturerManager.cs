@@ -1,6 +1,11 @@
+using System.Windows.Media;
+using DiscreteSimulation.FurnitureManufacturer.Entities;
 using DiscreteSimulation.FurnitureManufacturer.Utilities;
 using OSPABA;
+using OSPAnimator;
 using Simulation;
+using Color = System.Windows.Media.Color;
+
 namespace Agents.ManufacturerAgent
 {
 	//meta! id="4"
@@ -34,6 +39,9 @@ namespace Agents.ManufacturerAgent
 			MyAgent.UnfinishedOrders.AddFirst(myMessage);
 			MyAgent.PendingOrders.Enqueue(newOrder);
 			
+			// Nastavenie pozicie v zozname nedokončených objednávok (pre animátor)
+			newOrder.SetOrderPosition(MyAgent.UnfinishedOrders.Count - 1);
+			
 			foreach (var furnitureItem in newOrder.FurnitureItems)
 			{
 				// Pre zacatie spracovania polozky objednavky je potrebne najskor ziskat volnu linku
@@ -41,7 +49,8 @@ namespace Agents.ManufacturerAgent
 				{
 					Addressee = MySim.FindAgent(SimId.AssemblyLinesAgent),
 					Code = Mc.RequestAssemblyLine,
-					Furniture = furnitureItem
+					Furniture = furnitureItem,
+					Warehouse = MyAgent.Warehouse,
 				};
 				
 				Request(itemMessage);
@@ -138,6 +147,8 @@ namespace Agents.ManufacturerAgent
 			else
 			{
 				// Pracovnik sa nachadza v sklade, moze zacat pripravovat material
+				furniture.DisplayFurnitureAnimationObject();
+				
 				myMessage.Addressee = MySim.FindAgent(SimId.OperationAgent);
 				myMessage.Code = Mc.ExecuteOperationStep;
 				Request(myMessage);
@@ -150,6 +161,7 @@ namespace Agents.ManufacturerAgent
 			var furniture = myMessage.Furniture;
 			furniture.CurrentAssemblyLine = furniture.CurrentWorker.CurrentAssemblyLine;
 			furniture.CurrentAssemblyLine.ContainsFurniture = true;
+			furniture.DisplayFurnitureAnimationObject();
 			
 			myMessage.Addressee = MySim.FindAgent(SimId.OperationAgent);
 			myMessage.Code = Mc.ExecuteOperationStep;
@@ -181,9 +193,10 @@ namespace Agents.ManufacturerAgent
 			}
 			else
 			{
-				// Ak sa pracovnik nachadza na linke kde je narezany nabytok moze zacat morenie
+				// Ak sa pracovnik nachadza na linke kde je dany nabytok moze zacat vyrobny krok
 				worker.CurrentAssemblyLine.IdleWorkers.Remove(worker);
 				worker.CurrentAssemblyLine.CurrentWorker = worker;
+				worker.PlaceWorker(worker.CurrentFurniture.CurrentAssemblyLine.CurrentWorkerPosition.X, worker.CurrentFurniture.CurrentAssemblyLine.CurrentWorkerPosition.Y);
 				
 				myMessage.Addressee = MySim.FindAgent(SimId.OperationAgent);
 				myMessage.Code = Mc.ExecuteOperationStep;
@@ -207,6 +220,8 @@ namespace Agents.ManufacturerAgent
 				myMessage.Code = Mc.TransferWorker;
 				myMessage.IsTransferBetweenLines = false;
 				
+				furniture.RemoveFurnitureAnimationObject();
+				
 				Request(myMessage);
 
 				return;
@@ -214,8 +229,7 @@ namespace Agents.ManufacturerAgent
 			
 			furniture.CurrentWorker = null;
 			worker.CurrentFurniture = null;
-			worker.CurrentAssemblyLine.IdleWorkers.Add(worker);
-			worker.CurrentAssemblyLine.CurrentWorker = null;
+			worker.CurrentAssemblyLine.SetCurrentWorkerToIdle(worker);
 			
 			// Pokial bolo prave dokoncene Morenie vykonane pracovnikom C
 			// nasledujuca cinnost je Lakovanie (ak to nabytok vyžaduje) tiez vykonava pracovnik C
@@ -252,6 +266,8 @@ namespace Agents.ManufacturerAgent
 				furniture.CurrentAssemblyLine.CurrentFurniture = null;
 				furniture.CurrentAssemblyLine = null;
 				
+				furniture.RemoveFurnitureAnimationObject();
+				
 				MyAgent.ProcessingFurnitureTime.AddValue(MySim.CurrentTime - furniture.Order.ArrivalTime);
 				
 				Notice(myMessage);
@@ -273,6 +289,7 @@ namespace Agents.ManufacturerAgent
 						{
 							orderMessage = node.Value;
 							MyAgent.UnfinishedOrders.Remove(node);
+							RecalculateUnfinishedOrdersPositions();
 							break;
 						}
 						
@@ -312,6 +329,19 @@ namespace Agents.ManufacturerAgent
 			myMessage.Code = Mc.RequestWorker;
 			myMessage.Worker = null;
 			Request(myMessage);
+		}
+
+		private void RecalculateUnfinishedOrdersPositions()
+		{
+			var node = MyAgent.UnfinishedOrders.Last;
+			var index = 0;
+			
+			while (node != null)
+			{
+				node.Value.Order.SetOrderPosition(index);
+				index++;
+				node = node.Previous;
+			}
 		}
 		
 		//meta! userInfo="Process messages defined in code", id="0"
