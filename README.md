@@ -30,7 +30,7 @@ The application was developed as the third semester work on the Discrete Simulat
 - 🧮 Parallel configuration analyzer for running multiple simulation instances
 
 ## 🚀 Video Preview
-...
+https://github.com/user-attachments/assets/f7b1a771-8b32-423f-af49-0b548d4a9952
 
 ## 🏭 Simulation Scenario
 Models a furniture workshop order that consists of multiple furniture items (1 to 5). Each item can be one of the following types:
@@ -124,7 +124,7 @@ Aplikácia bola vytvorená ako tretia semestrálna práca v rámci predmetu Disk
 - 🧮 Paralelný analyzátor konfigurácií pre spúšťanie viacerých inštancií simulácie
 
 ## 🚀 Video ukážka
-...
+https://github.com/user-attachments/assets/f7b1a771-8b32-423f-af49-0b548d4a9952
 
 ## 🏭 Simulačný scenár
 Modeluje prevádzku stolárskej dielne, kde objednávka pozostáva z viacerých položiek nábytku (1 až 5). Každá položka môže byť jedného z nasledujúcich typov:
